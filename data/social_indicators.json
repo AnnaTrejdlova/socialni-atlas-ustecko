@@ -1,0 +1,114 @@
+{
+  "Bílina": {
+    "unemployment_rate": 7.5,
+    "exekuce_rate": 18.2,
+    "excluded_localities_ratio": 5.5,
+    "crime_rate_per_1k": 21.0,
+    "housing_benefits_per_1k": 45.0
+  },
+  "Chomutov": {
+    "unemployment_rate": 8.2,
+    "exekuce_rate": 16.5,
+    "excluded_localities_ratio": 6.8,
+    "crime_rate_per_1k": 24.5,
+    "housing_benefits_per_1k": 52.0
+  },
+  "Děčín": {
+    "unemployment_rate": 7.8,
+    "exekuce_rate": 14.2,
+    "excluded_localities_ratio": 4.2,
+    "crime_rate_per_1k": 18.2,
+    "housing_benefits_per_1k": 38.0
+  },
+  "Kadaň": {
+    "unemployment_rate": 6.5,
+    "exekuce_rate": 11.5,
+    "excluded_localities_ratio": 2.8,
+    "crime_rate_per_1k": 15.0,
+    "housing_benefits_per_1k": 30.0
+  },
+  "Litoměřice": {
+    "unemployment_rate": 4.8,
+    "exekuce_rate": 8.5,
+    "excluded_localities_ratio": 1.2,
+    "crime_rate_per_1k": 11.2,
+    "housing_benefits_per_1k": 18.0
+  },
+  "Litvínov": {
+    "unemployment_rate": 8.5,
+    "exekuce_rate": 15.8,
+    "excluded_localities_ratio": 6.2,
+    "crime_rate_per_1k": 23.0,
+    "housing_benefits_per_1k": 49.0
+  },
+  "Louny": {
+    "unemployment_rate": 5.2,
+    "exekuce_rate": 10.2,
+    "excluded_localities_ratio": 1.8,
+    "crime_rate_per_1k": 12.8,
+    "housing_benefits_per_1k": 22.0
+  },
+  "Lovosice": {
+    "unemployment_rate": 5.0,
+    "exekuce_rate": 9.8,
+    "excluded_localities_ratio": 1.5,
+    "crime_rate_per_1k": 13.5,
+    "housing_benefits_per_1k": 20.0
+  },
+  "Most": {
+    "unemployment_rate": 9.1,
+    "exekuce_rate": 17.5,
+    "excluded_localities_ratio": 7.5,
+    "crime_rate_per_1k": 28.0,
+    "housing_benefits_per_1k": 58.0
+  },
+  "Podbořany": {
+    "unemployment_rate": 6.2,
+    "exekuce_rate": 12.1,
+    "excluded_localities_ratio": 2.5,
+    "crime_rate_per_1k": 14.2,
+    "housing_benefits_per_1k": 28.0
+  },
+  "Roudnice nad Labem": {
+    "unemployment_rate": 4.1,
+    "exekuce_rate": 7.2,
+    "excluded_localities_ratio": 0.8,
+    "crime_rate_per_1k": 9.5,
+    "housing_benefits_per_1k": 12.0
+  },
+  "Rumburk": {
+    "unemployment_rate": 8.0,
+    "exekuce_rate": 13.8,
+    "excluded_localities_ratio": 4.8,
+    "crime_rate_per_1k": 19.5,
+    "housing_benefits_per_1k": 42.0
+  },
+  "Teplice": {
+    "unemployment_rate": 6.9,
+    "exekuce_rate": 13.5,
+    "excluded_localities_ratio": 3.5,
+    "crime_rate_per_1k": 17.0,
+    "housing_benefits_per_1k": 35.0
+  },
+  "Ústí nad Labem": {
+    "unemployment_rate": 7.6,
+    "exekuce_rate": 14.8,
+    "excluded_localities_ratio": 5.2,
+    "crime_rate_per_1k": 22.0,
+    "housing_benefits_per_1k": 44.0
+  },
+  "Varnsdorf": {
+    "unemployment_rate": 7.9,
+    "exekuce_rate": 13.9,
+    "excluded_localities_ratio": 4.5,
+    "crime_rate_per_1k": 18.0,
+    "housing_benefits_per_1k": 40.0
+  },
+  "Žatec": {
+    "unemployment_rate": 6.8,
+    "exekuce_rate": 12.5,
+    "excluded_localities_ratio": 3.0,
+    "crime_rate_per_1k": 16.2,
+    "housing_benefits_per_1k": 32.0
+  }
+}

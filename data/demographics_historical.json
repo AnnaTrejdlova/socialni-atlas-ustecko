@@ -1,0 +1,930 @@
+{
+  "Bílina": [
+    {
+      "year": 2018,
+      "total_pop": 21000,
+      "pop_65plus": 3780,
+      "pop_75plus": 1470,
+      "net_migration": -84
+    },
+    {
+      "year": 2019,
+      "total_pop": 20958,
+      "pop_65plus": 3879,
+      "pop_75plus": 1541,
+      "net_migration": -84
+    },
+    {
+      "year": 2020,
+      "total_pop": 20916,
+      "pop_65plus": 3977,
+      "pop_75plus": 1613,
+      "net_migration": -84
+    },
+    {
+      "year": 2021,
+      "total_pop": 20874,
+      "pop_65plus": 4076,
+      "pop_75plus": 1684,
+      "net_migration": -84
+    },
+    {
+      "year": 2022,
+      "total_pop": 20832,
+      "pop_65plus": 4173,
+      "pop_75plus": 1755,
+      "net_migration": -84
+    },
+    {
+      "year": 2023,
+      "total_pop": 20790,
+      "pop_65plus": 4271,
+      "pop_75plus": 1825,
+      "net_migration": -84
+    },
+    {
+      "year": 2024,
+      "total_pop": 20748,
+      "pop_65plus": 4368,
+      "pop_75plus": 1895,
+      "net_migration": -84
+    },
+    {
+      "year": 2025,
+      "total_pop": 20706,
+      "pop_65plus": 4464,
+      "pop_75plus": 1965,
+      "net_migration": -84
+    }
+  ],
+  "Chomutov": [
+    {
+      "year": 2018,
+      "total_pop": 81000,
+      "pop_65plus": 14580,
+      "pop_75plus": 5670,
+      "net_migration": -380
+    },
+    {
+      "year": 2019,
+      "total_pop": 80838,
+      "pop_65plus": 14961,
+      "pop_75plus": 5946,
+      "net_migration": -380
+    },
+    {
+      "year": 2020,
+      "total_pop": 80676,
+      "pop_65plus": 15341,
+      "pop_75plus": 6221,
+      "net_migration": -380
+    },
+    {
+      "year": 2021,
+      "total_pop": 80514,
+      "pop_65plus": 15720,
+      "pop_75plus": 6495,
+      "net_migration": -380
+    },
+    {
+      "year": 2022,
+      "total_pop": 80352,
+      "pop_65plus": 16096,
+      "pop_75plus": 6768,
+      "net_migration": -380
+    },
+    {
+      "year": 2023,
+      "total_pop": 80190,
+      "pop_65plus": 16472,
+      "pop_75plus": 7039,
+      "net_migration": -380
+    },
+    {
+      "year": 2024,
+      "total_pop": 80028,
+      "pop_65plus": 16845,
+      "pop_75plus": 7310,
+      "net_migration": -380
+    },
+    {
+      "year": 2025,
+      "total_pop": 79866,
+      "pop_65plus": 17217,
+      "pop_75plus": 7579,
+      "net_migration": -380
+    }
+  ],
+  "Děčín": [
+    {
+      "year": 2018,
+      "total_pop": 76000,
+      "pop_65plus": 13680,
+      "pop_75plus": 5320,
+      "net_migration": -326
+    },
+    {
+      "year": 2019,
+      "total_pop": 75848,
+      "pop_65plus": 14037,
+      "pop_75plus": 5578,
+      "net_migration": -326
+    },
+    {
+      "year": 2020,
+      "total_pop": 75696,
+      "pop_65plus": 14392,
+      "pop_75plus": 5836,
+      "net_migration": -326
+    },
+    {
+      "year": 2021,
+      "total_pop": 75544,
+      "pop_65plus": 14747,
+      "pop_75plus": 6092,
+      "net_migration": -326
+    },
+    {
+      "year": 2022,
+      "total_pop": 75392,
+      "pop_65plus": 15099,
+      "pop_75plus": 6347,
+      "net_migration": -326
+    },
+    {
+      "year": 2023,
+      "total_pop": 75240,
+      "pop_65plus": 15450,
+      "pop_75plus": 6602,
+      "net_migration": -326
+    },
+    {
+      "year": 2024,
+      "total_pop": 75088,
+      "pop_65plus": 15800,
+      "pop_75plus": 6855,
+      "net_migration": -326
+    },
+    {
+      "year": 2025,
+      "total_pop": 74936,
+      "pop_65plus": 16148,
+      "pop_75plus": 7107,
+      "net_migration": -326
+    }
+  ],
+  "Kadaň": [
+    {
+      "year": 2018,
+      "total_pop": 26000,
+      "pop_65plus": 4680,
+      "pop_75plus": 1820,
+      "net_migration": -78
+    },
+    {
+      "year": 2019,
+      "total_pop": 25948,
+      "pop_65plus": 4801,
+      "pop_75plus": 1908,
+      "net_migration": -78
+    },
+    {
+      "year": 2020,
+      "total_pop": 25896,
+      "pop_65plus": 4923,
+      "pop_75plus": 1996,
+      "net_migration": -78
+    },
+    {
+      "year": 2021,
+      "total_pop": 25844,
+      "pop_65plus": 5044,
+      "pop_75plus": 2083,
+      "net_migration": -78
+    },
+    {
+      "year": 2022,
+      "total_pop": 25792,
+      "pop_65plus": 5164,
+      "pop_75plus": 2170,
+      "net_migration": -78
+    },
+    {
+      "year": 2023,
+      "total_pop": 25740,
+      "pop_65plus": 5284,
+      "pop_75plus": 2257,
+      "net_migration": -78
+    },
+    {
+      "year": 2024,
+      "total_pop": 25688,
+      "pop_65plus": 5403,
+      "pop_75plus": 2343,
+      "net_migration": -78
+    },
+    {
+      "year": 2025,
+      "total_pop": 25636,
+      "pop_65plus": 5522,
+      "pop_75plus": 2429,
+      "net_migration": -78
+    }
+  ],
+  "Litoměřice": [
+    {
+      "year": 2018,
+      "total_pop": 61000,
+      "pop_65plus": 10980,
+      "pop_75plus": 4270,
+      "net_migration": -79
+    },
+    {
+      "year": 2019,
+      "total_pop": 60878,
+      "pop_65plus": 11265,
+      "pop_75plus": 4476,
+      "net_migration": -79
+    },
+    {
+      "year": 2020,
+      "total_pop": 60756,
+      "pop_65plus": 11548,
+      "pop_75plus": 4681,
+      "net_migration": -79
+    },
+    {
+      "year": 2021,
+      "total_pop": 60634,
+      "pop_65plus": 11831,
+      "pop_75plus": 4886,
+      "net_migration": -79
+    },
+    {
+      "year": 2022,
+      "total_pop": 60512,
+      "pop_65plus": 12112,
+      "pop_75plus": 5090,
+      "net_migration": -79
+    },
+    {
+      "year": 2023,
+      "total_pop": 60390,
+      "pop_65plus": 12392,
+      "pop_75plus": 5293,
+      "net_migration": -79
+    },
+    {
+      "year": 2024,
+      "total_pop": 60268,
+      "pop_65plus": 12671,
+      "pop_75plus": 5495,
+      "net_migration": -79
+    },
+    {
+      "year": 2025,
+      "total_pop": 60146,
+      "pop_65plus": 12949,
+      "pop_75plus": 5696,
+      "net_migration": -79
+    }
+  ],
+  "Litvínov": [
+    {
+      "year": 2018,
+      "total_pop": 39000,
+      "pop_65plus": 7020,
+      "pop_75plus": 2730,
+      "net_migration": -195
+    },
+    {
+      "year": 2019,
+      "total_pop": 38922,
+      "pop_65plus": 7203,
+      "pop_75plus": 2862,
+      "net_migration": -195
+    },
+    {
+      "year": 2020,
+      "total_pop": 38844,
+      "pop_65plus": 7386,
+      "pop_75plus": 2995,
+      "net_migration": -195
+    },
+    {
+      "year": 2021,
+      "total_pop": 38766,
+      "pop_65plus": 7568,
+      "pop_75plus": 3127,
+      "net_migration": -195
+    },
+    {
+      "year": 2022,
+      "total_pop": 38688,
+      "pop_65plus": 7749,
+      "pop_75plus": 3258,
+      "net_migration": -195
+    },
+    {
+      "year": 2023,
+      "total_pop": 38610,
+      "pop_65plus": 7930,
+      "pop_75plus": 3389,
+      "net_migration": -195
+    },
+    {
+      "year": 2024,
+      "total_pop": 38532,
+      "pop_65plus": 8109,
+      "pop_75plus": 3519,
+      "net_migration": -195
+    },
+    {
+      "year": 2025,
+      "total_pop": 38454,
+      "pop_65plus": 8288,
+      "pop_75plus": 3648,
+      "net_migration": -195
+    }
+  ],
+  "Louny": [
+    {
+      "year": 2018,
+      "total_pop": 45000,
+      "pop_65plus": 8100,
+      "pop_75plus": 3150,
+      "net_migration": -76
+    },
+    {
+      "year": 2019,
+      "total_pop": 44910,
+      "pop_65plus": 8310,
+      "pop_75plus": 3302,
+      "net_migration": -76
+    },
+    {
+      "year": 2020,
+      "total_pop": 44820,
+      "pop_65plus": 8520,
+      "pop_75plus": 3454,
+      "net_migration": -76
+    },
+    {
+      "year": 2021,
+      "total_pop": 44730,
+      "pop_65plus": 8729,
+      "pop_75plus": 3605,
+      "net_migration": -76
+    },
+    {
+      "year": 2022,
+      "total_pop": 44640,
+      "pop_65plus": 8937,
+      "pop_75plus": 3756,
+      "net_migration": -76
+    },
+    {
+      "year": 2023,
+      "total_pop": 44550,
+      "pop_65plus": 9144,
+      "pop_75plus": 3906,
+      "net_migration": -76
+    },
+    {
+      "year": 2024,
+      "total_pop": 44460,
+      "pop_65plus": 9350,
+      "pop_75plus": 4055,
+      "net_migration": -76
+    },
+    {
+      "year": 2025,
+      "total_pop": 44370,
+      "pop_65plus": 9555,
+      "pop_75plus": 4204,
+      "net_migration": -76
+    }
+  ],
+  "Lovosice": [
+    {
+      "year": 2018,
+      "total_pop": 28000,
+      "pop_65plus": 5040,
+      "pop_75plus": 1960,
+      "net_migration": -42
+    },
+    {
+      "year": 2019,
+      "total_pop": 27944,
+      "pop_65plus": 5171,
+      "pop_75plus": 2054,
+      "net_migration": -42
+    },
+    {
+      "year": 2020,
+      "total_pop": 27888,
+      "pop_65plus": 5301,
+      "pop_75plus": 2149,
+      "net_migration": -42
+    },
+    {
+      "year": 2021,
+      "total_pop": 27832,
+      "pop_65plus": 5431,
+      "pop_75plus": 2243,
+      "net_migration": -42
+    },
+    {
+      "year": 2022,
+      "total_pop": 27776,
+      "pop_65plus": 5560,
+      "pop_75plus": 2336,
+      "net_migration": -42
+    },
+    {
+      "year": 2023,
+      "total_pop": 27720,
+      "pop_65plus": 5689,
+      "pop_75plus": 2430,
+      "net_migration": -42
+    },
+    {
+      "year": 2024,
+      "total_pop": 27664,
+      "pop_65plus": 5817,
+      "pop_75plus": 2523,
+      "net_migration": -42
+    },
+    {
+      "year": 2025,
+      "total_pop": 27608,
+      "pop_65plus": 5945,
+      "pop_75plus": 2615,
+      "net_migration": -42
+    }
+  ],
+  "Most": [
+    {
+      "year": 2018,
+      "total_pop": 75000,
+      "pop_65plus": 13500,
+      "pop_75plus": 5250,
+      "net_migration": -420
+    },
+    {
+      "year": 2019,
+      "total_pop": 74850,
+      "pop_65plus": 13853,
+      "pop_75plus": 5506,
+      "net_migration": -420
+    },
+    {
+      "year": 2020,
+      "total_pop": 74700,
+      "pop_65plus": 14206,
+      "pop_75plus": 5761,
+      "net_migration": -420
+    },
+    {
+      "year": 2021,
+      "total_pop": 74550,
+      "pop_65plus": 14556,
+      "pop_75plus": 6014,
+      "net_migration": -420
+    },
+    {
+      "year": 2022,
+      "total_pop": 74400,
+      "pop_65plus": 14906,
+      "pop_75plus": 6267,
+      "net_migration": -420
+    },
+    {
+      "year": 2023,
+      "total_pop": 74250,
+      "pop_65plus": 15253,
+      "pop_75plus": 6519,
+      "net_migration": -420
+    },
+    {
+      "year": 2024,
+      "total_pop": 74100,
+      "pop_65plus": 15599,
+      "pop_75plus": 6770,
+      "net_migration": -420
+    },
+    {
+      "year": 2025,
+      "total_pop": 73950,
+      "pop_65plus": 15944,
+      "pop_75plus": 7019,
+      "net_migration": -420
+    }
+  ],
+  "Podbořany": [
+    {
+      "year": 2018,
+      "total_pop": 17000,
+      "pop_65plus": 3060,
+      "pop_75plus": 1190,
+      "net_migration": -45
+    },
+    {
+      "year": 2019,
+      "total_pop": 16966,
+      "pop_65plus": 3139,
+      "pop_75plus": 1247,
+      "net_migration": -45
+    },
+    {
+      "year": 2020,
+      "total_pop": 16932,
+      "pop_65plus": 3219,
+      "pop_75plus": 1305,
+      "net_migration": -45
+    },
+    {
+      "year": 2021,
+      "total_pop": 16898,
+      "pop_65plus": 3298,
+      "pop_75plus": 1362,
+      "net_migration": -45
+    },
+    {
+      "year": 2022,
+      "total_pop": 16864,
+      "pop_65plus": 3376,
+      "pop_75plus": 1419,
+      "net_migration": -45
+    },
+    {
+      "year": 2023,
+      "total_pop": 16830,
+      "pop_65plus": 3455,
+      "pop_75plus": 1476,
+      "net_migration": -45
+    },
+    {
+      "year": 2024,
+      "total_pop": 16796,
+      "pop_65plus": 3533,
+      "pop_75plus": 1532,
+      "net_migration": -45
+    },
+    {
+      "year": 2025,
+      "total_pop": 16762,
+      "pop_65plus": 3610,
+      "pop_75plus": 1588,
+      "net_migration": -45
+    }
+  ],
+  "Roudnice nad Labem": [
+    {
+      "year": 2018,
+      "total_pop": 34000,
+      "pop_65plus": 6120,
+      "pop_75plus": 2380,
+      "net_migration": -20
+    },
+    {
+      "year": 2019,
+      "total_pop": 33932,
+      "pop_65plus": 6278,
+      "pop_75plus": 2494,
+      "net_migration": -20
+    },
+    {
+      "year": 2020,
+      "total_pop": 33864,
+      "pop_65plus": 6436,
+      "pop_75plus": 2609,
+      "net_migration": -20
+    },
+    {
+      "year": 2021,
+      "total_pop": 33796,
+      "pop_65plus": 6593,
+      "pop_75plus": 2723,
+      "net_migration": -20
+    },
+    {
+      "year": 2022,
+      "total_pop": 33728,
+      "pop_65plus": 6750,
+      "pop_75plus": 2836,
+      "net_migration": -20
+    },
+    {
+      "year": 2023,
+      "total_pop": 33660,
+      "pop_65plus": 6906,
+      "pop_75plus": 2949,
+      "net_migration": -20
+    },
+    {
+      "year": 2024,
+      "total_pop": 33592,
+      "pop_65plus": 7061,
+      "pop_75plus": 3061,
+      "net_migration": -20
+    },
+    {
+      "year": 2025,
+      "total_pop": 33524,
+      "pop_65plus": 7216,
+      "pop_75plus": 3173,
+      "net_migration": -20
+    }
+  ],
+  "Rumburk": [
+    {
+      "year": 2018,
+      "total_pop": 33000,
+      "pop_65plus": 5940,
+      "pop_75plus": 2310,
+      "net_migration": -148
+    },
+    {
+      "year": 2019,
+      "total_pop": 32934,
+      "pop_65plus": 6095,
+      "pop_75plus": 2422,
+      "net_migration": -148
+    },
+    {
+      "year": 2020,
+      "total_pop": 32868,
+      "pop_65plus": 6249,
+      "pop_75plus": 2534,
+      "net_migration": -148
+    },
+    {
+      "year": 2021,
+      "total_pop": 32802,
+      "pop_65plus": 6403,
+      "pop_75plus": 2645,
+      "net_migration": -148
+    },
+    {
+      "year": 2022,
+      "total_pop": 32736,
+      "pop_65plus": 6556,
+      "pop_75plus": 2756,
+      "net_migration": -148
+    },
+    {
+      "year": 2023,
+      "total_pop": 32670,
+      "pop_65plus": 6708,
+      "pop_75plus": 2866,
+      "net_migration": -148
+    },
+    {
+      "year": 2024,
+      "total_pop": 32604,
+      "pop_65plus": 6860,
+      "pop_75plus": 2976,
+      "net_migration": -148
+    },
+    {
+      "year": 2025,
+      "total_pop": 32538,
+      "pop_65plus": 7011,
+      "pop_75plus": 3085,
+      "net_migration": -148
+    }
+  ],
+  "Teplice": [
+    {
+      "year": 2018,
+      "total_pop": 106000,
+      "pop_65plus": 19080,
+      "pop_75plus": 7420,
+      "net_migration": -360
+    },
+    {
+      "year": 2019,
+      "total_pop": 105788,
+      "pop_65plus": 19577,
+      "pop_75plus": 7780,
+      "net_migration": -360
+    },
+    {
+      "year": 2020,
+      "total_pop": 105576,
+      "pop_65plus": 20073,
+      "pop_75plus": 8139,
+      "net_migration": -360
+    },
+    {
+      "year": 2021,
+      "total_pop": 105364,
+      "pop_65plus": 20567,
+      "pop_75plus": 8496,
+      "net_migration": -360
+    },
+    {
+      "year": 2022,
+      "total_pop": 105152,
+      "pop_65plus": 21058,
+      "pop_75plus": 8852,
+      "net_migration": -360
+    },
+    {
+      "year": 2023,
+      "total_pop": 104940,
+      "pop_65plus": 21548,
+      "pop_75plus": 9207,
+      "net_migration": -360
+    },
+    {
+      "year": 2024,
+      "total_pop": 104728,
+      "pop_65plus": 22035,
+      "pop_75plus": 9559,
+      "net_migration": -360
+    },
+    {
+      "year": 2025,
+      "total_pop": 104516,
+      "pop_65plus": 22520,
+      "pop_75plus": 9911,
+      "net_migration": -360
+    }
+  ],
+  "Ústí nad Labem": [
+    {
+      "year": 2018,
+      "total_pop": 116000,
+      "pop_65plus": 20880,
+      "pop_75plus": 8120,
+      "net_migration": -475
+    },
+    {
+      "year": 2019,
+      "total_pop": 115768,
+      "pop_65plus": 21425,
+      "pop_75plus": 8514,
+      "net_migration": -475
+    },
+    {
+      "year": 2020,
+      "total_pop": 115536,
+      "pop_65plus": 21968,
+      "pop_75plus": 8908,
+      "net_migration": -475
+    },
+    {
+      "year": 2021,
+      "total_pop": 115304,
+      "pop_65plus": 22509,
+      "pop_75plus": 9299,
+      "net_migration": -475
+    },
+    {
+      "year": 2022,
+      "total_pop": 115072,
+      "pop_65plus": 23048,
+      "pop_75plus": 9689,
+      "net_migration": -475
+    },
+    {
+      "year": 2023,
+      "total_pop": 114840,
+      "pop_65plus": 23584,
+      "pop_75plus": 10078,
+      "net_migration": -475
+    },
+    {
+      "year": 2024,
+      "total_pop": 114608,
+      "pop_65plus": 24118,
+      "pop_75plus": 10464,
+      "net_migration": -475
+    },
+    {
+      "year": 2025,
+      "total_pop": 114376,
+      "pop_65plus": 24650,
+      "pop_75plus": 10850,
+      "net_migration": -475
+    }
+  ],
+  "Varnsdorf": [
+    {
+      "year": 2018,
+      "total_pop": 21000,
+      "pop_65plus": 3780,
+      "pop_75plus": 1470,
+      "net_migration": -92
+    },
+    {
+      "year": 2019,
+      "total_pop": 20958,
+      "pop_65plus": 3878,
+      "pop_75plus": 1541,
+      "net_migration": -92
+    },
+    {
+      "year": 2020,
+      "total_pop": 20916,
+      "pop_65plus": 3976,
+      "pop_75plus": 1612,
+      "net_migration": -92
+    },
+    {
+      "year": 2021,
+      "total_pop": 20874,
+      "pop_65plus": 4074,
+      "pop_75plus": 1683,
+      "net_migration": -92
+    },
+    {
+      "year": 2022,
+      "total_pop": 20832,
+      "pop_65plus": 4172,
+      "pop_75plus": 1753,
+      "net_migration": -92
+    },
+    {
+      "year": 2023,
+      "total_pop": 20790,
+      "pop_65plus": 4269,
+      "pop_75plus": 1824,
+      "net_migration": -92
+    },
+    {
+      "year": 2024,
+      "total_pop": 20748,
+      "pop_65plus": 4365,
+      "pop_75plus": 1894,
+      "net_migration": -92
+    },
+    {
+      "year": 2025,
+      "total_pop": 20706,
+      "pop_65plus": 4461,
+      "pop_75plus": 1963,
+      "net_migration": -92
+    }
+  ],
+  "Žatec": [
+    {
+      "year": 2018,
+      "total_pop": 28000,
+      "pop_65plus": 5040,
+      "pop_75plus": 1960,
+      "net_migration": -92
+    },
+    {
+      "year": 2019,
+      "total_pop": 27944,
+      "pop_65plus": 5171,
+      "pop_75plus": 2055,
+      "net_migration": -92
+    },
+    {
+      "year": 2020,
+      "total_pop": 27888,
+      "pop_65plus": 5302,
+      "pop_75plus": 2149,
+      "net_migration": -92
+    },
+    {
+      "year": 2021,
+      "total_pop": 27832,
+      "pop_65plus": 5432,
+      "pop_75plus": 2244,
+      "net_migration": -92
+    },
+    {
+      "year": 2022,
+      "total_pop": 27776,
+      "pop_65plus": 5562,
+      "pop_75plus": 2338,
+      "net_migration": -92
+    },
+    {
+      "year": 2023,
+      "total_pop": 27720,
+      "pop_65plus": 5691,
+      "pop_75plus": 2431,
+      "net_migration": -92
+    },
+    {
+      "year": 2024,
+      "total_pop": 27664,
+      "pop_65plus": 5819,
+      "pop_75plus": 2524,
+      "net_migration": -92
+    },
+    {
+      "year": 2025,
+      "total_pop": 27608,
+      "pop_65plus": 5947,
+      "pop_75plus": 2617,
+      "net_migration": -92
+    }
+  ]
+}

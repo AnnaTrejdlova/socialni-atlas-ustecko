@@ -1,0 +1,292 @@
+[
+  {
+    "name": "Domov pro seniory Chomutov",
+    "orp": "Chomutov",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Písečná 5045, Chomutov",
+    "lat": 50.4725,
+    "lon": 13.4328,
+    "capacity": 150,
+    "filled": 147
+  },
+  {
+    "name": "Pečovatelská služba Chomutov",
+    "orp": "Chomutov",
+    "type": "Field Care (Home Nursing)",
+    "address": "Školní 1215, Chomutov",
+    "lat": 50.4618,
+    "lon": 13.4182,
+    "capacity": 200,
+    "filled": 185
+  },
+  {
+    "name": "Azylový dům Chomutov",
+    "orp": "Chomutov",
+    "type": "Shelter & Social Prevention",
+    "address": "Na Bělidle 987, Chomutov",
+    "lat": 50.4572,
+    "lon": 13.4215,
+    "capacity": 45,
+    "filled": 42
+  },
+  {
+    "name": "Domov pro seniory Most - Barvířská",
+    "orp": "Most",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Barvířská 495, Most",
+    "lat": 50.5058,
+    "lon": 13.6391,
+    "capacity": 180,
+    "filled": 178
+  },
+  {
+    "name": "Městská správa sociálních služeb Most",
+    "orp": "Most",
+    "type": "Field Care (Home Nursing)",
+    "address": "J. Průchy 1915, Most",
+    "lat": 50.4998,
+    "lon": 13.6335,
+    "capacity": 250,
+    "filled": 242
+  },
+  {
+    "name": "Azylové centrum pro lidi v nouzi Most",
+    "orp": "Most",
+    "type": "Shelter & Social Prevention",
+    "address": "Růžová 124, Most",
+    "lat": 50.512,
+    "lon": 13.642,
+    "capacity": 60,
+    "filled": 59
+  },
+  {
+    "name": "Domov pro seniory Severní Terasa",
+    "orp": "Ústí nad Labem",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Severní Terasa, Ústí nad Labem",
+    "lat": 50.6738,
+    "lon": 14.0294,
+    "capacity": 210,
+    "filled": 208
+  },
+  {
+    "name": "Charitní domov pro seniory Ústí",
+    "orp": "Ústí nad Labem",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Lipová 12, Ústí nad Labem",
+    "lat": 50.6651,
+    "lon": 14.0412,
+    "capacity": 85,
+    "filled": 83
+  },
+  {
+    "name": "Městské služby sociální péče Ústí",
+    "orp": "Ústí nad Labem",
+    "type": "Field Care (Home Nursing)",
+    "address": "W. Churchilla 13, Ústí nad Labem",
+    "lat": 50.6612,
+    "lon": 14.0378,
+    "capacity": 300,
+    "filled": 280
+  },
+  {
+    "name": "Dům na půl cesty Ústí",
+    "orp": "Ústí nad Labem",
+    "type": "Shelter & Social Prevention",
+    "address": "Krásné Březno, Ústí nad Labem",
+    "lat": 50.6685,
+    "lon": 14.0754,
+    "capacity": 30,
+    "filled": 27
+  },
+  {
+    "name": "Domov pro seniory Děčín - Kamenická",
+    "orp": "Děčín",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Kamenická 284, Děčín",
+    "lat": 50.7812,
+    "lon": 14.2256,
+    "capacity": 140,
+    "filled": 138
+  },
+  {
+    "name": "Centrum sociálních služeb Děčín",
+    "orp": "Děčín",
+    "type": "Field Care (Home Nursing)",
+    "address": "28. října, Děčín",
+    "lat": 50.7735,
+    "lon": 14.2091,
+    "capacity": 180,
+    "filled": 172
+  },
+  {
+    "name": "Domov pro seniory Teplice - Šanov",
+    "orp": "Teplice",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Štěpánova 45, Teplice",
+    "lat": 50.6372,
+    "lon": 13.8394,
+    "capacity": 120,
+    "filled": 118
+  },
+  {
+    "name": "Sociální služby města Teplice",
+    "orp": "Teplice",
+    "type": "Field Care (Home Nursing)",
+    "address": "U Nových lázní 10, Teplice",
+    "lat": 50.6405,
+    "lon": 13.8441,
+    "capacity": 150,
+    "filled": 139
+  },
+  {
+    "name": "Domov pro seniory Litvínov - Janov",
+    "orp": "Litvínov",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Křižatecká 16, Litvínov - Janov",
+    "lat": 50.5975,
+    "lon": 13.5658,
+    "capacity": 90,
+    "filled": 88
+  },
+  {
+    "name": "Pečovatelská služba Litvínov",
+    "orp": "Litvínov",
+    "type": "Field Care (Home Nursing)",
+    "address": "Podkrušnohorská 1720, Litvínov",
+    "lat": 50.5942,
+    "lon": 13.6184,
+    "capacity": 110,
+    "filled": 105
+  },
+  {
+    "name": "Domov pro seniory Bílina",
+    "orp": "Bílina",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Bezručova 48, Bílina",
+    "lat": 50.5482,
+    "lon": 13.7812,
+    "capacity": 70,
+    "filled": 68
+  },
+  {
+    "name": "Městská pečovatelská služba Bílina",
+    "orp": "Bílina",
+    "type": "Field Care (Home Nursing)",
+    "address": "Kysely 102, Bílina",
+    "lat": 50.551,
+    "lon": 13.7745,
+    "capacity": 80,
+    "filled": 75
+  },
+  {
+    "name": "Domov pro seniory Litoměřice - Dómská",
+    "orp": "Litoměřice",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Dómská 14, Litoměřice",
+    "lat": 50.5312,
+    "lon": 14.1294,
+    "capacity": 110,
+    "filled": 105
+  },
+  {
+    "name": "Farní charita Litoměřice",
+    "orp": "Litoměřice",
+    "type": "Field Care (Home Nursing)",
+    "address": "Švermova 18, Litoměřice",
+    "lat": 50.5365,
+    "lon": 14.1351,
+    "capacity": 140,
+    "filled": 122
+  },
+  {
+    "name": "Domov pro seniory Lovosice",
+    "orp": "Lovosice",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Smetanova 8, Lovosice",
+    "lat": 50.5152,
+    "lon": 14.0538,
+    "capacity": 65,
+    "filled": 63
+  },
+  {
+    "name": "Domov pro seniory Žatec",
+    "orp": "Žatec",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Písečná 2800, Žatec",
+    "lat": 50.3245,
+    "lon": 13.5412,
+    "capacity": 80,
+    "filled": 78
+  },
+  {
+    "name": "Pečovatelská služba Žatec",
+    "orp": "Žatec",
+    "type": "Field Care (Home Nursing)",
+    "address": "Kovářská 4, Žatec",
+    "lat": 50.3289,
+    "lon": 13.5468,
+    "capacity": 90,
+    "filled": 82
+  },
+  {
+    "name": "Domov pro seniory Louny",
+    "orp": "Louny",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Rybalkova 2900, Louny",
+    "lat": 50.3541,
+    "lon": 13.7915,
+    "capacity": 90,
+    "filled": 87
+  },
+  {
+    "name": "Domov pro seniory Rumburk",
+    "orp": "Rumburk",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Jiříkovská 14, Rumburk",
+    "lat": 50.9542,
+    "lon": 14.5518,
+    "capacity": 85,
+    "filled": 84
+  },
+  {
+    "name": "Domov pro seniory Varnsdorf",
+    "orp": "Varnsdorf",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Legionářů 22, Varnsdorf",
+    "lat": 50.9112,
+    "lon": 14.6185,
+    "capacity": 75,
+    "filled": 74
+  },
+  {
+    "name": "Domov pro seniory Kadaň",
+    "orp": "Kadaň",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Golovinova 1340, Kadaň",
+    "lat": 50.3752,
+    "lon": 13.2721,
+    "capacity": 70,
+    "filled": 67
+  },
+  {
+    "name": "Městská pečovatelská služba Podbořany",
+    "orp": "Podbořany",
+    "type": "Field Care (Home Nursing)",
+    "address": "Mírová 80, Podbořany",
+    "lat": 50.2289,
+    "lon": 13.4112,
+    "capacity": 45,
+    "filled": 40
+  },
+  {
+    "name": "Domov pro seniory Roudnice",
+    "orp": "Roudnice nad Labem",
+    "type": "Stationary Care (Home for Seniors)",
+    "address": "Krabčická 1520, Roudnice nad Labem",
+    "lat": 50.4215,
+    "lon": 14.2541,
+    "capacity": 95,
+    "filled": 92
+  }
+]

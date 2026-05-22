@@ -4,4 +4,15 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "streamlit>=1.35.0",
+    "fastapi>=0.111.0",
+    "uvicorn>=0.30.0",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "plotly>=5.22.0",
+    "folium>=0.16.0",
+    "streamlit-folium>=0.19.0",
+    "requests>=2.32.0",
+]
+
