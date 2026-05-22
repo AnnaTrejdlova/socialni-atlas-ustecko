@@ -3,9 +3,9 @@ import json
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from backend.forecasting import (
-    calculate_capacity_deficit, 
-    get_white_spots, 
-    DATA_DIR, 
+    calculate_capacity_deficit,
+    get_white_spots,
+    DATA_DIR,
     load_json_file
 )
 
@@ -63,6 +63,14 @@ def get_demographics_historical():
         raise HTTPException(status_code=404, detail="File demographics_historical.json not found.")
     return data
 
+@app.get("/api/orp/cssz")
+def get_cssz_data():
+    """Return mocked CSSZ pension data per ORP."""
+    data = load_json_file("cssz_data.json")
+    if not data:
+        raise HTTPException(status_code=404, detail="File cssz_data.json not found.")
+    return data
+
 @app.get("/api/social-services")
 def get_social_services():
     """Return the registry of social services (GPS, capacity, types)."""
@@ -84,16 +92,16 @@ def get_predictions(
         indicators = load_json_file("social_indicators.json")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
     predictions = {}
     for orp in indicators.keys():
         deficit_info = calculate_capacity_deficit(orp, year)
-        
+
         # Determine stress alert
         stress_alert = False
         if deficit_info["deficit_percent"] >= capacity_deficit_threshold:
             stress_alert = True
-            
+
         predictions[orp] = {
             "orp": orp,
             "year": year,
@@ -104,7 +112,7 @@ def get_predictions(
             "exekuce_rate": indicators[orp]["exekuce_rate"],
             "excluded_localities_ratio": indicators[orp]["excluded_localities_ratio"]
         }
-        
+
     return predictions
 
 @app.get("/api/white-spots")

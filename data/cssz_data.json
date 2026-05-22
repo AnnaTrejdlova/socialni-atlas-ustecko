@@ -1,0 +1,114 @@
+{
+  "Bílina": {
+    "average_pension": 18300,
+    "recipients": 2600,
+    "avg_sickness_duration_days": 40,
+    "sickness_days_total": 150000,
+    "sickness_ratio_pct": 4.0
+  },
+  "Chomutov": {
+    "average_pension": 18550,
+    "recipients": 3100,
+    "avg_sickness_duration_days": 41,
+    "sickness_days_total": 160000,
+    "sickness_ratio_pct": 4.1
+  },
+  "Děčín": {
+    "average_pension": 18550,
+    "recipients": 3100,
+    "avg_sickness_duration_days": 42,
+    "sickness_days_total": 170000,
+    "sickness_ratio_pct": 4.2
+  },
+  "Kadaň": {
+    "average_pension": 18700,
+    "recipients": 3400,
+    "avg_sickness_duration_days": 43,
+    "sickness_days_total": 180000,
+    "sickness_ratio_pct": 4.3
+  },
+  "Litoměřice": {
+    "average_pension": 19100,
+    "recipients": 4200,
+    "avg_sickness_duration_days": 44,
+    "sickness_days_total": 190000,
+    "sickness_ratio_pct": 4.4
+  },
+  "Litvínov": {
+    "average_pension": 19150,
+    "recipients": 4300,
+    "avg_sickness_duration_days": 40,
+    "sickness_days_total": 200000,
+    "sickness_ratio_pct": 4.5
+  },
+  "Louny": {
+    "average_pension": 19150,
+    "recipients": 4300,
+    "avg_sickness_duration_days": 41,
+    "sickness_days_total": 210000,
+    "sickness_ratio_pct": 4.6
+  },
+  "Lovosice": {
+    "average_pension": 19450,
+    "recipients": 4900,
+    "avg_sickness_duration_days": 42,
+    "sickness_days_total": 220000,
+    "sickness_ratio_pct": 4.7
+  },
+  "Most": {
+    "average_pension": 19400,
+    "recipients": 4800,
+    "avg_sickness_duration_days": 43,
+    "sickness_days_total": 230000,
+    "sickness_ratio_pct": 4.8
+  },
+  "Podbořany": {
+    "average_pension": 19800,
+    "recipients": 5600,
+    "avg_sickness_duration_days": 44,
+    "sickness_days_total": 240000,
+    "sickness_ratio_pct": 4.9
+  },
+  "Roudnice nad Labem": {
+    "average_pension": 20400,
+    "recipients": 6800,
+    "avg_sickness_duration_days": 40,
+    "sickness_days_total": 250000,
+    "sickness_ratio_pct": 5.0
+  },
+  "Rumburk": {
+    "average_pension": 20000,
+    "recipients": 6000,
+    "avg_sickness_duration_days": 41,
+    "sickness_days_total": 260000,
+    "sickness_ratio_pct": 5.1
+  },
+  "Teplice": {
+    "average_pension": 20150,
+    "recipients": 6300,
+    "avg_sickness_duration_days": 42,
+    "sickness_days_total": 270000,
+    "sickness_ratio_pct": 5.2
+  },
+  "Ústí nad Labem": {
+    "average_pension": 20650,
+    "recipients": 7300,
+    "avg_sickness_duration_days": 43,
+    "sickness_days_total": 280000,
+    "sickness_ratio_pct": 5.3
+  },
+  "Varnsdorf": {
+    "average_pension": 20550,
+    "recipients": 7100,
+    "avg_sickness_duration_days": 44,
+    "sickness_days_total": 290000,
+    "sickness_ratio_pct": 5.4
+  },
+  "Žatec": {
+    "average_pension": 20500,
+    "recipients": 7000,
+    "avg_sickness_duration_days": 40,
+    "sickness_days_total": 300000,
+    "sickness_ratio_pct": 5.5
+  }
+}

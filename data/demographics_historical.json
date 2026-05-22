@@ -2,929 +2,929 @@
   "Bílina": [
     {
       "year": 2018,
-      "total_pop": 21000,
-      "pop_65plus": 3780,
-      "pop_75plus": 1470,
-      "net_migration": -84
+      "total_pop": 22542,
+      "pop_65plus": 3802,
+      "pop_75plus": 1212,
+      "net_migration": -90
     },
     {
       "year": 2019,
-      "total_pop": 20958,
-      "pop_65plus": 3879,
-      "pop_75plus": 1541,
-      "net_migration": -84
+      "total_pop": 22600,
+      "pop_65plus": 3935,
+      "pop_75plus": 1289,
+      "net_migration": -90
     },
     {
       "year": 2020,
-      "total_pop": 20916,
-      "pop_65plus": 3977,
-      "pop_75plus": 1613,
-      "net_migration": -84
+      "total_pop": 22508,
+      "pop_65plus": 4031,
+      "pop_75plus": 1363,
+      "net_migration": -90
     },
     {
       "year": 2021,
-      "total_pop": 20874,
-      "pop_65plus": 4076,
-      "pop_75plus": 1684,
-      "net_migration": -84
+      "total_pop": 19400,
+      "pop_65plus": 3818,
+      "pop_75plus": 1401,
+      "net_migration": -77
     },
     {
       "year": 2022,
-      "total_pop": 20832,
-      "pop_65plus": 4173,
-      "pop_75plus": 1755,
-      "net_migration": -84
+      "total_pop": 19626,
+      "pop_65plus": 3854,
+      "pop_75plus": 1517,
+      "net_migration": -78
     },
     {
       "year": 2023,
-      "total_pop": 20790,
-      "pop_65plus": 4271,
-      "pop_75plus": 1825,
-      "net_migration": -84
+      "total_pop": 19601,
+      "pop_65plus": 3852,
+      "pop_75plus": 1593,
+      "net_migration": -78
     },
     {
       "year": 2024,
-      "total_pop": 20748,
-      "pop_65plus": 4368,
-      "pop_75plus": 1895,
-      "net_migration": -84
+      "total_pop": 19487,
+      "pop_65plus": 3839,
+      "pop_75plus": 1669,
+      "net_migration": -77
     },
     {
       "year": 2025,
-      "total_pop": 20706,
-      "pop_65plus": 4464,
-      "pop_75plus": 1965,
-      "net_migration": -84
+      "total_pop": 18245,
+      "pop_65plus": 3842,
+      "pop_75plus": 1739,
+      "net_migration": -72
     }
   ],
   "Chomutov": [
     {
       "year": 2018,
-      "total_pop": 81000,
-      "pop_65plus": 14580,
-      "pop_75plus": 5670,
-      "net_migration": -380
+      "total_pop": 81640,
+      "pop_65plus": 14359,
+      "pop_75plus": 4999,
+      "net_migration": -383
     },
     {
       "year": 2019,
-      "total_pop": 80838,
-      "pop_65plus": 14961,
-      "pop_75plus": 5946,
-      "net_migration": -380
+      "total_pop": 81662,
+      "pop_65plus": 14681,
+      "pop_75plus": 5198,
+      "net_migration": -383
     },
     {
       "year": 2020,
-      "total_pop": 80676,
-      "pop_65plus": 15341,
-      "pop_75plus": 6221,
-      "net_migration": -380
+      "total_pop": 81553,
+      "pop_65plus": 14838,
+      "pop_75plus": 5253,
+      "net_migration": -383
     },
     {
       "year": 2021,
-      "total_pop": 80514,
-      "pop_65plus": 15720,
-      "pop_75plus": 6495,
-      "net_migration": -380
+      "total_pop": 79204,
+      "pop_65plus": 14970,
+      "pop_75plus": 5527,
+      "net_migration": -372
     },
     {
       "year": 2022,
-      "total_pop": 80352,
-      "pop_65plus": 16096,
-      "pop_75plus": 6768,
-      "net_migration": -380
+      "total_pop": 80665,
+      "pop_65plus": 15297,
+      "pop_75plus": 5911,
+      "net_migration": -379
     },
     {
       "year": 2023,
-      "total_pop": 80190,
-      "pop_65plus": 16472,
-      "pop_75plus": 7039,
-      "net_migration": -380
+      "total_pop": 80828,
+      "pop_65plus": 15563,
+      "pop_75plus": 6277,
+      "net_migration": -379
     },
     {
       "year": 2024,
-      "total_pop": 80028,
-      "pop_65plus": 16845,
-      "pop_75plus": 7310,
-      "net_migration": -380
+      "total_pop": 80589,
+      "pop_65plus": 15746,
+      "pop_75plus": 6626,
+      "net_migration": -378
     },
     {
       "year": 2025,
-      "total_pop": 79866,
-      "pop_65plus": 17217,
-      "pop_75plus": 7579,
-      "net_migration": -380
+      "total_pop": 80061,
+      "pop_65plus": 15976,
+      "pop_75plus": 6784,
+      "net_migration": -376
     }
   ],
   "Děčín": [
     {
       "year": 2018,
-      "total_pop": 76000,
-      "pop_65plus": 13680,
-      "pop_75plus": 5320,
-      "net_migration": -326
+      "total_pop": 77031,
+      "pop_65plus": 16060,
+      "pop_75plus": 5506,
+      "net_migration": -331
     },
     {
       "year": 2019,
-      "total_pop": 75848,
-      "pop_65plus": 14037,
-      "pop_75plus": 5578,
-      "net_migration": -326
+      "total_pop": 76842,
+      "pop_65plus": 16362,
+      "pop_75plus": 5775,
+      "net_migration": -330
     },
     {
       "year": 2020,
-      "total_pop": 75696,
-      "pop_65plus": 14392,
-      "pop_75plus": 5836,
-      "net_migration": -326
+      "total_pop": 76131,
+      "pop_65plus": 16404,
+      "pop_75plus": 5904,
+      "net_migration": -327
     },
     {
       "year": 2021,
-      "total_pop": 75544,
-      "pop_65plus": 14747,
-      "pop_75plus": 6092,
-      "net_migration": -326
+      "total_pop": 74944,
+      "pop_65plus": 16493,
+      "pop_75plus": 6298,
+      "net_migration": -322
     },
     {
       "year": 2022,
-      "total_pop": 75392,
-      "pop_65plus": 15099,
-      "pop_75plus": 6347,
-      "net_migration": -326
+      "total_pop": 75342,
+      "pop_65plus": 16717,
+      "pop_75plus": 6875,
+      "net_migration": -323
     },
     {
       "year": 2023,
-      "total_pop": 75240,
-      "pop_65plus": 15450,
-      "pop_75plus": 6602,
-      "net_migration": -326
+      "total_pop": 74893,
+      "pop_65plus": 16773,
+      "pop_75plus": 7359,
+      "net_migration": -322
     },
     {
       "year": 2024,
-      "total_pop": 75088,
-      "pop_65plus": 15800,
-      "pop_75plus": 6855,
-      "net_migration": -326
+      "total_pop": 74323,
+      "pop_65plus": 16688,
+      "pop_75plus": 7713,
+      "net_migration": -319
     },
     {
       "year": 2025,
-      "total_pop": 74936,
-      "pop_65plus": 16148,
-      "pop_75plus": 7107,
-      "net_migration": -326
+      "total_pop": 73813,
+      "pop_65plus": 16930,
+      "pop_75plus": 8027,
+      "net_migration": -317
     }
   ],
   "Kadaň": [
     {
       "year": 2018,
-      "total_pop": 26000,
-      "pop_65plus": 4680,
-      "pop_75plus": 1820,
-      "net_migration": -78
+      "total_pop": 43111,
+      "pop_65plus": 7866,
+      "pop_75plus": 2614,
+      "net_migration": -129
     },
     {
       "year": 2019,
-      "total_pop": 25948,
-      "pop_65plus": 4801,
-      "pop_75plus": 1908,
-      "net_migration": -78
+      "total_pop": 43284,
+      "pop_65plus": 8078,
+      "pop_75plus": 2740,
+      "net_migration": -129
     },
     {
       "year": 2020,
-      "total_pop": 25896,
-      "pop_65plus": 4923,
-      "pop_75plus": 1996,
-      "net_migration": -78
+      "total_pop": 43047,
+      "pop_65plus": 8240,
+      "pop_75plus": 2792,
+      "net_migration": -129
     },
     {
       "year": 2021,
-      "total_pop": 25844,
-      "pop_65plus": 5044,
-      "pop_75plus": 2083,
-      "net_migration": -78
+      "total_pop": 42276,
+      "pop_65plus": 8260,
+      "pop_75plus": 2909,
+      "net_migration": -126
     },
     {
       "year": 2022,
-      "total_pop": 25792,
-      "pop_65plus": 5164,
-      "pop_75plus": 2170,
-      "net_migration": -78
+      "total_pop": 43370,
+      "pop_65plus": 8476,
+      "pop_75plus": 3160,
+      "net_migration": -130
     },
     {
       "year": 2023,
-      "total_pop": 25740,
-      "pop_65plus": 5284,
-      "pop_75plus": 2257,
-      "net_migration": -78
+      "total_pop": 43119,
+      "pop_65plus": 8570,
+      "pop_75plus": 3438,
+      "net_migration": -129
     },
     {
       "year": 2024,
-      "total_pop": 25688,
-      "pop_65plus": 5403,
-      "pop_75plus": 2343,
-      "net_migration": -78
+      "total_pop": 42864,
+      "pop_65plus": 8625,
+      "pop_75plus": 3671,
+      "net_migration": -128
     },
     {
       "year": 2025,
-      "total_pop": 25636,
-      "pop_65plus": 5522,
-      "pop_75plus": 2429,
-      "net_migration": -78
+      "total_pop": 42903,
+      "pop_65plus": 8801,
+      "pop_75plus": 3751,
+      "net_migration": -128
     }
   ],
   "Litoměřice": [
     {
       "year": 2018,
-      "total_pop": 61000,
-      "pop_65plus": 10980,
-      "pop_75plus": 4270,
-      "net_migration": -79
+      "total_pop": 59118,
+      "pop_65plus": 11313,
+      "pop_75plus": 4044,
+      "net_migration": -76
     },
     {
       "year": 2019,
-      "total_pop": 60878,
-      "pop_65plus": 11265,
-      "pop_75plus": 4476,
-      "net_migration": -79
+      "total_pop": 59110,
+      "pop_65plus": 11658,
+      "pop_75plus": 4195,
+      "net_migration": -76
     },
     {
       "year": 2020,
-      "total_pop": 60756,
-      "pop_65plus": 11548,
-      "pop_75plus": 4681,
-      "net_migration": -79
+      "total_pop": 58756,
+      "pop_65plus": 11849,
+      "pop_75plus": 4256,
+      "net_migration": -76
     },
     {
       "year": 2021,
-      "total_pop": 60634,
-      "pop_65plus": 11831,
-      "pop_75plus": 4886,
-      "net_migration": -79
+      "total_pop": 57785,
+      "pop_65plus": 12007,
+      "pop_75plus": 4491,
+      "net_migration": -75
     },
     {
       "year": 2022,
-      "total_pop": 60512,
-      "pop_65plus": 12112,
-      "pop_75plus": 5090,
-      "net_migration": -79
+      "total_pop": 58580,
+      "pop_65plus": 12193,
+      "pop_75plus": 4832,
+      "net_migration": -76
     },
     {
       "year": 2023,
-      "total_pop": 60390,
-      "pop_65plus": 12392,
-      "pop_75plus": 5293,
-      "net_migration": -79
+      "total_pop": 58499,
+      "pop_65plus": 12328,
+      "pop_75plus": 5140,
+      "net_migration": -76
     },
     {
       "year": 2024,
-      "total_pop": 60268,
-      "pop_65plus": 12671,
-      "pop_75plus": 5495,
-      "net_migration": -79
+      "total_pop": 58212,
+      "pop_65plus": 12344,
+      "pop_75plus": 5412,
+      "net_migration": -75
     },
     {
       "year": 2025,
-      "total_pop": 60146,
-      "pop_65plus": 12949,
-      "pop_75plus": 5696,
-      "net_migration": -79
+      "total_pop": 57991,
+      "pop_65plus": 12638,
+      "pop_75plus": 5562,
+      "net_migration": -75
     }
   ],
   "Litvínov": [
     {
       "year": 2018,
-      "total_pop": 39000,
-      "pop_65plus": 7020,
-      "pop_75plus": 2730,
-      "net_migration": -195
+      "total_pop": 37214,
+      "pop_65plus": 7624,
+      "pop_75plus": 2801,
+      "net_migration": -186
     },
     {
       "year": 2019,
-      "total_pop": 38922,
-      "pop_65plus": 7203,
-      "pop_75plus": 2862,
-      "net_migration": -195
+      "total_pop": 37035,
+      "pop_65plus": 7785,
+      "pop_75plus": 2927,
+      "net_migration": -185
     },
     {
       "year": 2020,
-      "total_pop": 38844,
-      "pop_65plus": 7386,
-      "pop_75plus": 2995,
-      "net_migration": -195
+      "total_pop": 36934,
+      "pop_65plus": 7864,
+      "pop_75plus": 2955,
+      "net_migration": -184
     },
     {
       "year": 2021,
-      "total_pop": 38766,
-      "pop_65plus": 7568,
-      "pop_75plus": 3127,
-      "net_migration": -195
+      "total_pop": 35650,
+      "pop_65plus": 7792,
+      "pop_75plus": 3038,
+      "net_migration": -178
     },
     {
       "year": 2022,
-      "total_pop": 38688,
-      "pop_65plus": 7749,
-      "pop_75plus": 3258,
-      "net_migration": -195
+      "total_pop": 35946,
+      "pop_65plus": 7836,
+      "pop_75plus": 3191,
+      "net_migration": -179
     },
     {
       "year": 2023,
-      "total_pop": 38610,
-      "pop_65plus": 7930,
-      "pop_75plus": 3389,
-      "net_migration": -195
+      "total_pop": 35734,
+      "pop_65plus": 7874,
+      "pop_75plus": 3350,
+      "net_migration": -178
     },
     {
       "year": 2024,
-      "total_pop": 38532,
-      "pop_65plus": 8109,
-      "pop_75plus": 3519,
-      "net_migration": -195
+      "total_pop": 35669,
+      "pop_65plus": 7837,
+      "pop_75plus": 3473,
+      "net_migration": -178
     },
     {
       "year": 2025,
-      "total_pop": 38454,
-      "pop_65plus": 8288,
-      "pop_75plus": 3648,
-      "net_migration": -195
+      "total_pop": 35136,
+      "pop_65plus": 7914,
+      "pop_75plus": 3547,
+      "net_migration": -175
     }
   ],
   "Louny": [
     {
       "year": 2018,
-      "total_pop": 45000,
-      "pop_65plus": 8100,
-      "pop_75plus": 3150,
-      "net_migration": -76
+      "total_pop": 43514,
+      "pop_65plus": 8352,
+      "pop_75plus": 2792,
+      "net_migration": -73
     },
     {
       "year": 2019,
-      "total_pop": 44910,
-      "pop_65plus": 8310,
-      "pop_75plus": 3302,
-      "net_migration": -76
+      "total_pop": 43640,
+      "pop_65plus": 8545,
+      "pop_75plus": 2921,
+      "net_migration": -74
     },
     {
       "year": 2020,
-      "total_pop": 44820,
-      "pop_65plus": 8520,
-      "pop_75plus": 3454,
-      "net_migration": -76
+      "total_pop": 43467,
+      "pop_65plus": 8713,
+      "pop_75plus": 2966,
+      "net_migration": -73
     },
     {
       "year": 2021,
-      "total_pop": 44730,
-      "pop_65plus": 8729,
-      "pop_75plus": 3605,
-      "net_migration": -76
+      "total_pop": 42895,
+      "pop_65plus": 8790,
+      "pop_75plus": 3148,
+      "net_migration": -72
     },
     {
       "year": 2022,
-      "total_pop": 44640,
-      "pop_65plus": 8937,
-      "pop_75plus": 3756,
-      "net_migration": -76
+      "total_pop": 43556,
+      "pop_65plus": 8975,
+      "pop_75plus": 3437,
+      "net_migration": -74
     },
     {
       "year": 2023,
-      "total_pop": 44550,
-      "pop_65plus": 9144,
-      "pop_75plus": 3906,
-      "net_migration": -76
+      "total_pop": 43520,
+      "pop_65plus": 9062,
+      "pop_75plus": 3649,
+      "net_migration": -73
     },
     {
       "year": 2024,
-      "total_pop": 44460,
-      "pop_65plus": 9350,
-      "pop_75plus": 4055,
-      "net_migration": -76
+      "total_pop": 43534,
+      "pop_65plus": 9131,
+      "pop_75plus": 3860,
+      "net_migration": -74
     },
     {
       "year": 2025,
-      "total_pop": 44370,
-      "pop_65plus": 9555,
-      "pop_75plus": 4204,
-      "net_migration": -76
+      "total_pop": 43433,
+      "pop_65plus": 9314,
+      "pop_75plus": 3986,
+      "net_migration": -73
     }
   ],
   "Lovosice": [
     {
       "year": 2018,
-      "total_pop": 28000,
-      "pop_65plus": 5040,
-      "pop_75plus": 1960,
-      "net_migration": -42
+      "total_pop": 27660,
+      "pop_65plus": 5707,
+      "pop_75plus": 2198,
+      "net_migration": -41
     },
     {
       "year": 2019,
-      "total_pop": 27944,
-      "pop_65plus": 5171,
-      "pop_75plus": 2054,
-      "net_migration": -42
+      "total_pop": 27750,
+      "pop_65plus": 5804,
+      "pop_75plus": 2264,
+      "net_migration": -41
     },
     {
       "year": 2020,
-      "total_pop": 27888,
-      "pop_65plus": 5301,
-      "pop_75plus": 2149,
-      "net_migration": -42
+      "total_pop": 27615,
+      "pop_65plus": 5795,
+      "pop_75plus": 2239,
+      "net_migration": -41
     },
     {
       "year": 2021,
-      "total_pop": 27832,
-      "pop_65plus": 5431,
-      "pop_75plus": 2243,
-      "net_migration": -42
+      "total_pop": 27238,
+      "pop_65plus": 5772,
+      "pop_75plus": 2246,
+      "net_migration": -40
     },
     {
       "year": 2022,
-      "total_pop": 27776,
-      "pop_65plus": 5560,
-      "pop_75plus": 2336,
-      "net_migration": -42
+      "total_pop": 27626,
+      "pop_65plus": 5826,
+      "pop_75plus": 2409,
+      "net_migration": -41
     },
     {
       "year": 2023,
-      "total_pop": 27720,
-      "pop_65plus": 5689,
-      "pop_75plus": 2430,
-      "net_migration": -42
+      "total_pop": 27622,
+      "pop_65plus": 5875,
+      "pop_75plus": 2527,
+      "net_migration": -41
     },
     {
       "year": 2024,
-      "total_pop": 27664,
-      "pop_65plus": 5817,
-      "pop_75plus": 2523,
-      "net_migration": -42
+      "total_pop": 27512,
+      "pop_65plus": 5852,
+      "pop_75plus": 2616,
+      "net_migration": -41
     },
     {
       "year": 2025,
-      "total_pop": 27608,
-      "pop_65plus": 5945,
-      "pop_75plus": 2615,
-      "net_migration": -42
+      "total_pop": 27476,
+      "pop_65plus": 5891,
+      "pop_75plus": 2635,
+      "net_migration": -41
     }
   ],
   "Most": [
     {
       "year": 2018,
-      "total_pop": 75000,
-      "pop_65plus": 13500,
-      "pop_75plus": 5250,
-      "net_migration": -420
+      "total_pop": 74835,
+      "pop_65plus": 13375,
+      "pop_75plus": 4796,
+      "net_migration": -419
     },
     {
       "year": 2019,
-      "total_pop": 74850,
-      "pop_65plus": 13853,
-      "pop_75plus": 5506,
-      "net_migration": -420
+      "total_pop": 74673,
+      "pop_65plus": 13629,
+      "pop_75plus": 5026,
+      "net_migration": -418
     },
     {
       "year": 2020,
-      "total_pop": 74700,
-      "pop_65plus": 14206,
-      "pop_75plus": 5761,
-      "net_migration": -420
+      "total_pop": 73999,
+      "pop_65plus": 13709,
+      "pop_75plus": 5060,
+      "net_migration": -414
     },
     {
       "year": 2021,
-      "total_pop": 74550,
-      "pop_65plus": 14556,
-      "pop_75plus": 6014,
-      "net_migration": -420
+      "total_pop": 71123,
+      "pop_65plus": 13613,
+      "pop_75plus": 5161,
+      "net_migration": -398
     },
     {
       "year": 2022,
-      "total_pop": 74400,
-      "pop_65plus": 14906,
-      "pop_75plus": 6267,
-      "net_migration": -420
+      "total_pop": 72170,
+      "pop_65plus": 13821,
+      "pop_75plus": 5535,
+      "net_migration": -404
     },
     {
       "year": 2023,
-      "total_pop": 74250,
-      "pop_65plus": 15253,
-      "pop_75plus": 6519,
-      "net_migration": -420
+      "total_pop": 72218,
+      "pop_65plus": 14027,
+      "pop_75plus": 5873,
+      "net_migration": -404
     },
     {
       "year": 2024,
-      "total_pop": 74100,
-      "pop_65plus": 15599,
-      "pop_75plus": 6770,
-      "net_migration": -420
+      "total_pop": 71867,
+      "pop_65plus": 14128,
+      "pop_75plus": 6149,
+      "net_migration": -402
     },
     {
       "year": 2025,
-      "total_pop": 73950,
-      "pop_65plus": 15944,
-      "pop_75plus": 7019,
-      "net_migration": -420
+      "total_pop": 70748,
+      "pop_65plus": 14209,
+      "pop_75plus": 6261,
+      "net_migration": -396
     }
   ],
   "Podbořany": [
     {
       "year": 2018,
-      "total_pop": 17000,
-      "pop_65plus": 3060,
-      "pop_75plus": 1190,
-      "net_migration": -45
+      "total_pop": 15668,
+      "pop_65plus": 3006,
+      "pop_75plus": 1077,
+      "net_migration": -42
     },
     {
       "year": 2019,
-      "total_pop": 16966,
-      "pop_65plus": 3139,
-      "pop_75plus": 1247,
-      "net_migration": -45
+      "total_pop": 15678,
+      "pop_65plus": 3106,
+      "pop_75plus": 1097,
+      "net_migration": -42
     },
     {
       "year": 2020,
-      "total_pop": 16932,
-      "pop_65plus": 3219,
-      "pop_75plus": 1305,
-      "net_migration": -45
+      "total_pop": 15649,
+      "pop_65plus": 3152,
+      "pop_75plus": 1094,
+      "net_migration": -42
     },
     {
       "year": 2021,
-      "total_pop": 16898,
-      "pop_65plus": 3298,
-      "pop_75plus": 1362,
-      "net_migration": -45
+      "total_pop": 15472,
+      "pop_65plus": 3124,
+      "pop_75plus": 1096,
+      "net_migration": -41
     },
     {
       "year": 2022,
-      "total_pop": 16864,
-      "pop_65plus": 3376,
-      "pop_75plus": 1419,
-      "net_migration": -45
+      "total_pop": 15712,
+      "pop_65plus": 3201,
+      "pop_75plus": 1155,
+      "net_migration": -42
     },
     {
       "year": 2023,
-      "total_pop": 16830,
-      "pop_65plus": 3455,
-      "pop_75plus": 1476,
-      "net_migration": -45
+      "total_pop": 15622,
+      "pop_65plus": 3252,
+      "pop_75plus": 1253,
+      "net_migration": -42
     },
     {
       "year": 2024,
-      "total_pop": 16796,
-      "pop_65plus": 3533,
-      "pop_75plus": 1532,
-      "net_migration": -45
+      "total_pop": 15535,
+      "pop_65plus": 3245,
+      "pop_75plus": 1297,
+      "net_migration": -41
     },
     {
       "year": 2025,
-      "total_pop": 16762,
-      "pop_65plus": 3610,
-      "pop_75plus": 1588,
-      "net_migration": -45
+      "total_pop": 15555,
+      "pop_65plus": 3306,
+      "pop_75plus": 1300,
+      "net_migration": -41
     }
   ],
   "Roudnice nad Labem": [
     {
       "year": 2018,
-      "total_pop": 34000,
-      "pop_65plus": 6120,
-      "pop_75plus": 2380,
-      "net_migration": -20
+      "total_pop": 32877,
+      "pop_65plus": 6541,
+      "pop_75plus": 2390,
+      "net_migration": -19
     },
     {
       "year": 2019,
-      "total_pop": 33932,
-      "pop_65plus": 6278,
-      "pop_75plus": 2494,
-      "net_migration": -20
+      "total_pop": 32808,
+      "pop_65plus": 6650,
+      "pop_75plus": 2478,
+      "net_migration": -19
     },
     {
       "year": 2020,
-      "total_pop": 33864,
-      "pop_65plus": 6436,
-      "pop_75plus": 2609,
-      "net_migration": -20
+      "total_pop": 32806,
+      "pop_65plus": 6744,
+      "pop_75plus": 2461,
+      "net_migration": -19
     },
     {
       "year": 2021,
-      "total_pop": 33796,
-      "pop_65plus": 6593,
-      "pop_75plus": 2723,
-      "net_migration": -20
+      "total_pop": 32559,
+      "pop_65plus": 6818,
+      "pop_75plus": 2627,
+      "net_migration": -19
     },
     {
       "year": 2022,
-      "total_pop": 33728,
-      "pop_65plus": 6750,
-      "pop_75plus": 2836,
-      "net_migration": -20
+      "total_pop": 33151,
+      "pop_65plus": 6949,
+      "pop_75plus": 2783,
+      "net_migration": -19
     },
     {
       "year": 2023,
-      "total_pop": 33660,
-      "pop_65plus": 6906,
-      "pop_75plus": 2949,
+      "total_pop": 33365,
+      "pop_65plus": 7057,
+      "pop_75plus": 2975,
       "net_migration": -20
     },
     {
       "year": 2024,
-      "total_pop": 33592,
-      "pop_65plus": 7061,
-      "pop_75plus": 3061,
+      "total_pop": 33380,
+      "pop_65plus": 7092,
+      "pop_75plus": 3107,
       "net_migration": -20
     },
     {
       "year": 2025,
-      "total_pop": 33524,
-      "pop_65plus": 7216,
-      "pop_75plus": 3173,
+      "total_pop": 33416,
+      "pop_65plus": 7217,
+      "pop_75plus": 3184,
       "net_migration": -20
     }
   ],
   "Rumburk": [
     {
       "year": 2018,
-      "total_pop": 33000,
-      "pop_65plus": 5940,
-      "pop_75plus": 2310,
-      "net_migration": -148
+      "total_pop": 32795,
+      "pop_65plus": 6538,
+      "pop_75plus": 2149,
+      "net_migration": -147
     },
     {
       "year": 2019,
-      "total_pop": 32934,
-      "pop_65plus": 6095,
-      "pop_75plus": 2422,
-      "net_migration": -148
+      "total_pop": 32795,
+      "pop_65plus": 6681,
+      "pop_75plus": 2245,
+      "net_migration": -147
     },
     {
       "year": 2020,
-      "total_pop": 32868,
-      "pop_65plus": 6249,
-      "pop_75plus": 2534,
-      "net_migration": -148
+      "total_pop": 32529,
+      "pop_65plus": 6652,
+      "pop_75plus": 2275,
+      "net_migration": -146
     },
     {
       "year": 2021,
-      "total_pop": 32802,
-      "pop_65plus": 6403,
-      "pop_75plus": 2645,
-      "net_migration": -148
+      "total_pop": 31999,
+      "pop_65plus": 6703,
+      "pop_75plus": 2398,
+      "net_migration": -143
     },
     {
       "year": 2022,
-      "total_pop": 32736,
-      "pop_65plus": 6556,
-      "pop_75plus": 2756,
-      "net_migration": -148
+      "total_pop": 32429,
+      "pop_65plus": 6803,
+      "pop_75plus": 2579,
+      "net_migration": -145
     },
     {
       "year": 2023,
-      "total_pop": 32670,
-      "pop_65plus": 6708,
-      "pop_75plus": 2866,
-      "net_migration": -148
+      "total_pop": 32222,
+      "pop_65plus": 6854,
+      "pop_75plus": 2739,
+      "net_migration": -144
     },
     {
       "year": 2024,
-      "total_pop": 32604,
-      "pop_65plus": 6860,
-      "pop_75plus": 2976,
-      "net_migration": -148
+      "total_pop": 32072,
+      "pop_65plus": 6894,
+      "pop_75plus": 2891,
+      "net_migration": -144
     },
     {
       "year": 2025,
-      "total_pop": 32538,
-      "pop_65plus": 7011,
-      "pop_75plus": 3085,
-      "net_migration": -148
+      "total_pop": 31917,
+      "pop_65plus": 6955,
+      "pop_75plus": 2970,
+      "net_migration": -143
     }
   ],
   "Teplice": [
     {
       "year": 2018,
-      "total_pop": 106000,
-      "pop_65plus": 19080,
-      "pop_75plus": 7420,
+      "total_pop": 106068,
+      "pop_65plus": 20795,
+      "pop_75plus": 7411,
       "net_migration": -360
     },
     {
       "year": 2019,
-      "total_pop": 105788,
-      "pop_65plus": 19577,
-      "pop_75plus": 7780,
-      "net_migration": -360
+      "total_pop": 106472,
+      "pop_65plus": 21215,
+      "pop_75plus": 7808,
+      "net_migration": -362
     },
     {
       "year": 2020,
-      "total_pop": 105576,
-      "pop_65plus": 20073,
-      "pop_75plus": 8139,
-      "net_migration": -360
+      "total_pop": 106322,
+      "pop_65plus": 21345,
+      "pop_75plus": 7950,
+      "net_migration": -361
     },
     {
       "year": 2021,
-      "total_pop": 105364,
-      "pop_65plus": 20567,
-      "pop_75plus": 8496,
-      "net_migration": -360
+      "total_pop": 105072,
+      "pop_65plus": 21437,
+      "pop_75plus": 8267,
+      "net_migration": -357
     },
     {
       "year": 2022,
-      "total_pop": 105152,
-      "pop_65plus": 21058,
-      "pop_75plus": 8852,
-      "net_migration": -360
+      "total_pop": 108055,
+      "pop_65plus": 21863,
+      "pop_75plus": 8917,
+      "net_migration": -367
     },
     {
       "year": 2023,
-      "total_pop": 104940,
-      "pop_65plus": 21548,
-      "pop_75plus": 9207,
-      "net_migration": -360
+      "total_pop": 108317,
+      "pop_65plus": 22055,
+      "pop_75plus": 9477,
+      "net_migration": -368
     },
     {
       "year": 2024,
-      "total_pop": 104728,
-      "pop_65plus": 22035,
-      "pop_75plus": 9559,
-      "net_migration": -360
+      "total_pop": 108252,
+      "pop_65plus": 22190,
+      "pop_75plus": 9961,
+      "net_migration": -368
     },
     {
       "year": 2025,
-      "total_pop": 104516,
-      "pop_65plus": 22520,
-      "pop_75plus": 9911,
-      "net_migration": -360
+      "total_pop": 108647,
+      "pop_65plus": 22469,
+      "pop_75plus": 10249,
+      "net_migration": -369
     }
   ],
   "Ústí nad Labem": [
     {
       "year": 2018,
-      "total_pop": 116000,
-      "pop_65plus": 20880,
-      "pop_75plus": 8120,
-      "net_migration": -475
+      "total_pop": 119407,
+      "pop_65plus": 23556,
+      "pop_75plus": 8582,
+      "net_migration": -489
     },
     {
       "year": 2019,
-      "total_pop": 115768,
-      "pop_65plus": 21425,
-      "pop_75plus": 8514,
-      "net_migration": -475
+      "total_pop": 119338,
+      "pop_65plus": 23971,
+      "pop_75plus": 8954,
+      "net_migration": -489
     },
     {
       "year": 2020,
-      "total_pop": 115536,
-      "pop_65plus": 21968,
-      "pop_75plus": 8908,
-      "net_migration": -475
+      "total_pop": 118651,
+      "pop_65plus": 24029,
+      "pop_75plus": 9004,
+      "net_migration": -486
     },
     {
       "year": 2021,
-      "total_pop": 115304,
-      "pop_65plus": 22509,
-      "pop_75plus": 9299,
-      "net_migration": -475
+      "total_pop": 116916,
+      "pop_65plus": 24057,
+      "pop_75plus": 9455,
+      "net_migration": -479
     },
     {
       "year": 2022,
-      "total_pop": 115072,
-      "pop_65plus": 23048,
-      "pop_75plus": 9689,
-      "net_migration": -475
+      "total_pop": 118839,
+      "pop_65plus": 24311,
+      "pop_75plus": 10229,
+      "net_migration": -487
     },
     {
       "year": 2023,
-      "total_pop": 114840,
-      "pop_65plus": 23584,
-      "pop_75plus": 10078,
-      "net_migration": -475
+      "total_pop": 118433,
+      "pop_65plus": 24449,
+      "pop_75plus": 10868,
+      "net_migration": -485
     },
     {
       "year": 2024,
-      "total_pop": 114608,
-      "pop_65plus": 24118,
-      "pop_75plus": 10464,
-      "net_migration": -475
+      "total_pop": 118011,
+      "pop_65plus": 24436,
+      "pop_75plus": 11438,
+      "net_migration": -483
     },
     {
       "year": 2025,
-      "total_pop": 114376,
-      "pop_65plus": 24650,
-      "pop_75plus": 10850,
-      "net_migration": -475
+      "total_pop": 117683,
+      "pop_65plus": 24669,
+      "pop_75plus": 11735,
+      "net_migration": -482
     }
   ],
   "Varnsdorf": [
     {
       "year": 2018,
-      "total_pop": 21000,
-      "pop_65plus": 3780,
-      "pop_75plus": 1470,
-      "net_migration": -92
+      "total_pop": 20005,
+      "pop_65plus": 4041,
+      "pop_75plus": 1359,
+      "net_migration": -88
     },
     {
       "year": 2019,
-      "total_pop": 20958,
-      "pop_65plus": 3878,
-      "pop_75plus": 1541,
-      "net_migration": -92
+      "total_pop": 19905,
+      "pop_65plus": 4211,
+      "pop_75plus": 1416,
+      "net_migration": -87
     },
     {
       "year": 2020,
-      "total_pop": 20916,
-      "pop_65plus": 3976,
-      "pop_75plus": 1612,
-      "net_migration": -92
+      "total_pop": 19789,
+      "pop_65plus": 4317,
+      "pop_75plus": 1438,
+      "net_migration": -87
     },
     {
       "year": 2021,
-      "total_pop": 20874,
-      "pop_65plus": 4074,
-      "pop_75plus": 1683,
-      "net_migration": -92
+      "total_pop": 19351,
+      "pop_65plus": 4291,
+      "pop_75plus": 1473,
+      "net_migration": -85
     },
     {
       "year": 2022,
-      "total_pop": 20832,
-      "pop_65plus": 4172,
-      "pop_75plus": 1753,
-      "net_migration": -92
+      "total_pop": 19498,
+      "pop_65plus": 4324,
+      "pop_75plus": 1598,
+      "net_migration": -85
     },
     {
       "year": 2023,
-      "total_pop": 20790,
-      "pop_65plus": 4269,
-      "pop_75plus": 1824,
-      "net_migration": -92
+      "total_pop": 19419,
+      "pop_65plus": 4323,
+      "pop_75plus": 1713,
+      "net_migration": -85
     },
     {
       "year": 2024,
-      "total_pop": 20748,
-      "pop_65plus": 4365,
-      "pop_75plus": 1894,
-      "net_migration": -92
+      "total_pop": 19395,
+      "pop_65plus": 4298,
+      "pop_75plus": 1818,
+      "net_migration": -85
     },
     {
       "year": 2025,
-      "total_pop": 20706,
-      "pop_65plus": 4461,
-      "pop_75plus": 1963,
-      "net_migration": -92
+      "total_pop": 19181,
+      "pop_65plus": 4400,
+      "pop_75plus": 1849,
+      "net_migration": -84
     }
   ],
   "Žatec": [
     {
       "year": 2018,
-      "total_pop": 28000,
-      "pop_65plus": 5040,
-      "pop_75plus": 1960,
-      "net_migration": -92
+      "total_pop": 27304,
+      "pop_65plus": 5114,
+      "pop_75plus": 1803,
+      "net_migration": -90
     },
     {
       "year": 2019,
-      "total_pop": 27944,
-      "pop_65plus": 5171,
-      "pop_75plus": 2055,
-      "net_migration": -92
+      "total_pop": 27373,
+      "pop_65plus": 5216,
+      "pop_75plus": 1861,
+      "net_migration": -90
     },
     {
       "year": 2020,
-      "total_pop": 27888,
-      "pop_65plus": 5302,
-      "pop_75plus": 2149,
-      "net_migration": -92
+      "total_pop": 27248,
+      "pop_65plus": 5271,
+      "pop_75plus": 1832,
+      "net_migration": -89
     },
     {
       "year": 2021,
-      "total_pop": 27832,
-      "pop_65plus": 5432,
-      "pop_75plus": 2244,
-      "net_migration": -92
+      "total_pop": 27014,
+      "pop_65plus": 5321,
+      "pop_75plus": 1908,
+      "net_migration": -89
     },
     {
       "year": 2022,
-      "total_pop": 27776,
-      "pop_65plus": 5562,
-      "pop_75plus": 2338,
-      "net_migration": -92
+      "total_pop": 27772,
+      "pop_65plus": 5424,
+      "pop_75plus": 2058,
+      "net_migration": -91
     },
     {
       "year": 2023,
-      "total_pop": 27720,
-      "pop_65plus": 5691,
-      "pop_75plus": 2431,
-      "net_migration": -92
+      "total_pop": 27757,
+      "pop_65plus": 5465,
+      "pop_75plus": 2182,
+      "net_migration": -91
     },
     {
       "year": 2024,
-      "total_pop": 27664,
-      "pop_65plus": 5819,
-      "pop_75plus": 2524,
-      "net_migration": -92
+      "total_pop": 27654,
+      "pop_65plus": 5519,
+      "pop_75plus": 2263,
+      "net_migration": -91
     },
     {
       "year": 2025,
-      "total_pop": 27608,
-      "pop_65plus": 5947,
-      "pop_75plus": 2617,
-      "net_migration": -92
+      "total_pop": 27780,
+      "pop_65plus": 5599,
+      "pop_75plus": 2307,
+      "net_migration": -91
     }
   ]
 }
