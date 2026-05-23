@@ -78,6 +78,11 @@ def fallback_fetch(endpoint, params=None):
         with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
 
+    elif endpoint == "/api/orp/cssz/quantiles":
+        filepath = os.path.join(data_dir, "cssz_national_quantiles.json")
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+
     elif endpoint == "/api/predictions":
         year = int(params.get("year", 2030) if params else 2030)
         threshold = float(params.get("capacity_deficit_threshold", 20.0) if params else 20.0)
@@ -265,6 +270,7 @@ try:
     services = fetch_data("/api/social-services")
     geojson_data = fetch_data("/api/orp/geojson")
     cssz_data = fetch_data("/api/orp/cssz")
+    cssz_quantiles = fetch_data("/api/orp/cssz/quantiles")
     demographics_data = fetch_data("/api/orp/demographics")
 except Exception as e:
     st.error(f"Nepodařilo se načíst základní data. Zkontrolujte prosím přítomnost souborů ve složce data/. Detaily: {e}")
@@ -283,31 +289,6 @@ if "menu_version" not in st.session_state:
 orp_options = ["Celý kraj"] + sorted(list(indicators.keys()))
 
 # ----------------- SIDEBAR PANEL -----------------
-# Theme toggle button in sidebar header
-col_theme_lbl, col_theme_sw = st.sidebar.columns([3, 1])
-with col_theme_lbl:
-    st.markdown("<div style='padding-top: 5px; font-size: 0.8rem; font-weight: 800; color: var(--sidebar-text-muted); text-transform: uppercase;'>REŽIM VZHLEDU</div>", unsafe_allow_html=True)
-with col_theme_sw:
-    is_light = st.toggle("☀️", value=(st.session_state.theme == "light"), key="theme_toggle", label_visibility="collapsed")
-    new_theme = "light" if is_light else "dark"
-    if new_theme != st.session_state.theme:
-        st.session_state.theme = new_theme
-        st.query_params["theme"] = new_theme
-        
-        # Write back to localStorage using a tiny helper component
-        components.html(f"""
-        <script>
-            try {{
-                window.parent.localStorage.setItem('theme', '{new_theme}');
-            }} catch (e) {{
-                console.error(e);
-            }}
-        </script>
-        """, height=0, width=0)
-        st.rerun()
-
-st.sidebar.markdown("<hr style='border-color: var(--sidebar-hr); margin: 5px 0px 15px 0px;'/>", unsafe_allow_html=True)
-
 st.sidebar.markdown("""
 <div style="text-align: center; padding-bottom: 10px;">
     <h2 style="color: var(--sidebar-text-primary); font-weight: 800; margin-bottom: 0px; font-size: 1.5rem;">NASTAVENÍ</h2>
@@ -371,6 +352,30 @@ st.sidebar.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.sidebar.markdown("<hr style='border-color: var(--sidebar-hr); margin: 15px 0px;'/>", unsafe_allow_html=True)
+
+# Theme toggle button in sidebar header
+col_theme_lbl, col_theme_sw = st.sidebar.columns([3, 1])
+with col_theme_lbl:
+    st.markdown("<div style='padding-top: 5px; font-size: 0.8rem; font-weight: 800; color: var(--sidebar-text-muted); text-transform: uppercase;'>REŽIM VZHLEDU</div>", unsafe_allow_html=True)
+with col_theme_sw:
+    is_light = st.toggle("☀️", value=(st.session_state.theme == "light"), key="theme_toggle", label_visibility="collapsed")
+    new_theme = "light" if is_light else "dark"
+    if new_theme != st.session_state.theme:
+        st.session_state.theme = new_theme
+        st.query_params["theme"] = new_theme
+        
+        # Write back to localStorage using a tiny helper component
+        components.html(f"""
+        <script>
+            try {{
+                window.parent.localStorage.setItem('theme', '{new_theme}');
+            }} catch (e) {{
+                console.error(e);
+            }}
+        </script>
+        """, height=0, width=0)
+        st.rerun()
 
 # ----------------- MAIN APP CONTENT -----------------
 
@@ -999,16 +1004,24 @@ with tab_cssz:
 
     col_c1, col_c2, col_c3 = st.columns(3)
     with col_c1:
-        st.markdown("### 🧓 Starobní důchody (Odhad)")
+        st.markdown("### 🧓 Starobní důchody")
         if selected_orp == "Celý kraj":
             total_recipients = sum(v["recipients"] for v in cssz_data.values())
             avg_pension = int(sum(v["average_pension"] * v["recipients"] for v in cssz_data.values()) / total_recipients)
-            render_metric_card("Průměrná výše důchodu", f"{avg_pension:,}".replace(",", " ") + " Kč", "Mírný nárůst", "up")
-            render_metric_card("Počet příjemců starobního důchodu", f"{total_recipients:,}".replace(",", " "), "Dle dat ČSSZ", "none")
+            total_volume = sum(v["average_pension"] * v["recipients"] for v in cssz_data.values())
+            volume_mld = total_volume / 1_000_000_000.0
+            
+            render_metric_card("Průměrná výše důchodu", f"{avg_pension:,}".replace(",", " ") + " Kč", "ČSSZ 2024", "none")
+            render_metric_card("Počet příjemců starobního důchodu", f"{total_recipients:,}".replace(",", " "), "ČSSZ 2024", "none")
+            render_metric_card("Celkový měsíční objem důchodů", f"{total_volume:,}".replace(",", " ") + " Kč", f"~ {volume_mld:.2f} mld. Kč", "none")
         else:
             orp_cssz = cssz_data[selected_orp]
-            render_metric_card(f"Průměrný důchod v ORP {selected_orp}", f"{orp_cssz['average_pension']:,}".replace(",", " ") + " Kč", "Ukázková data", "none")
-            render_metric_card("Počet příjemců", f"{orp_cssz['recipients']:,}".replace(",", " "), "Stabilní", "none")
+            monthly_volume = orp_cssz["recipients"] * orp_cssz["average_pension"]
+            volume_mil = monthly_volume / 1_000_000.0
+            
+            render_metric_card(f"Průměrný důchod v ORP {selected_orp}", f"{orp_cssz['average_pension']:,}".replace(",", " ") + " Kč", "ČSSZ 2024", "none")
+            render_metric_card("Počet příjemců", f"{orp_cssz['recipients']:,}".replace(",", " "), "ČSSZ 2024", "none")
+            render_metric_card("Měsíční objem důchodů v ORP", f"{monthly_volume:,}".replace(",", " ") + " Kč", f"~ {volume_mil:.2f} mil. Kč", "none")
 
     with col_c2:
         st.markdown("### 🤒 Nemocenské a další dávky")
@@ -1050,7 +1063,59 @@ with tab_cssz:
             render_metric_card(f"Výdělečně činní v ORP {selected_orp}", f"{active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
             render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", f"Poměr pro ORP {selected_orp}", "down" if ratio < 2.0 else "none")
 
-    st.info("💡 Toto je ukázková vizualizace sekce pro data ČSSZ integrovaná z back-endu.")
+    if cssz_quantiles:
+        quantiles = cssz_quantiles.get("quantiles", {})
+        ref_period = cssz_quantiles.get("reference_period", "2024-12-31")
+        
+        st.markdown("<hr style='border-color: var(--sidebar-hr); margin: 25px 0px;'/>", unsafe_allow_html=True)
+        st.markdown(f"### 📊 Celostátní rozdělení výše starobních důchodů (ČSSZ k {ref_period})", unsafe_allow_html=True)
+        
+        col_q1, col_q2, col_q3 = st.columns(3)
+        with col_q1:
+            render_metric_card("10% nejnižších důchodů (pod)", f"{int(quantiles.get('Q10', 0)):,}".replace(",", " ") + " Kč", "10. kvantil v ČR", "none")
+        with col_q2:
+            render_metric_card("Mediánový důchod (50% seniorů)", f"{int(quantiles.get('Q50', 0)):,}".replace(",", " ") + " Kč", "50. kvantil (střední hodnota)", "none")
+        with col_q3:
+            render_metric_card("10% nejvyšších důchodů (nad)", f"{int(quantiles.get('Q90', 0)):,}".replace(",", " ") + " Kč", "90. kvantil v ČR", "none")
+            
+        df_q = pd.DataFrame([
+            {"Kvantil": "10% nejnižších (Q10)", "Výše důchodu": quantiles.get("Q10", 0)},
+            {"Kvantil": "Medián (Q50)", "Výše důchodu": quantiles.get("Q50", 0)},
+            {"Kvantil": "10% nejvyšších (Q90)", "Výše důchodu": quantiles.get("Q90", 0)}
+        ])
+        
+        fig_q = px.bar(
+            df_q,
+            x="Výše důchodu",
+            y="Kvantil",
+            orientation="h",
+            text="Výše důchodu",
+            color="Kvantil",
+            color_discrete_map={
+                "10% nejnižších (Q10)": "#ff9f1c",
+                "Medián (Q50)": "#4285f4",
+                "10% nejvyšších (Q90)": "#2ec4b6"
+            },
+            height=220
+        )
+        fig_q.update_traces(
+            textposition='auto', 
+            texttemplate='%{text:,.0f} Kč',
+            hovertemplate='<b>%{y}</b><br>Výše: %{x:,.0f} Kč<extra></extra>'
+        )
+        fig_q.update_layout(
+            template=plotly_template,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color=font_color),
+            showlegend=False,
+            margin=dict(l=10, r=10, t=10, b=10),
+            xaxis=dict(gridcolor=grid_color, title="Měsíční výše důchodu (Kč)"),
+            yaxis=dict(title="")
+        )
+        st.plotly_chart(fig_q, use_container_width=True)
+
+    st.info("💡 Údaje o důchodech jsou staženy a integrovány přímo z otevřených dat České správy sociálního zabezpečení (ČSSZ).")
 
 # Custom page footer matching style.css definitions
 st.markdown("""

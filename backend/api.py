@@ -35,7 +35,9 @@ def read_root():
             "/api/orp/demographics",
             "/api/social-services",
             "/api/predictions",
-            "/api/white-spots"
+            "/api/white-spots",
+            "/api/orp/cssz",
+            "/api/orp/cssz/quantiles"
         ]
     }
 
@@ -69,6 +71,14 @@ def get_cssz_data():
     data = load_json_file("cssz_data.json")
     if not data:
         raise HTTPException(status_code=404, detail="File cssz_data.json not found.")
+    return data
+
+@app.get("/api/orp/cssz/quantiles")
+def get_cssz_quantiles():
+    """Return national CSSZ pension quantiles."""
+    data = load_json_file("cssz_national_quantiles.json")
+    if not data:
+        raise HTTPException(status_code=404, detail="File cssz_national_quantiles.json not found.")
     return data
 
 @app.get("/api/social-services")

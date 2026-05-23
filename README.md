@@ -2,8 +2,6 @@
 
 Tato webová aplikace představuje funkční prototyp **Rozhodovací podpory pro plánování sociálních služeb** v Ústeckém kraji. Kombinuje historická demografická data s prediktivním modelováním budoucích potřeb a socioekonomickými stresovými indikátory pro identifikaci ohrožených oblastí (tzv. "Bílých míst").
 
-*Poznámka: Na přání uživatele byl z této verze vynechán modul generativního AI asistenta (LLM).*
-
 ---
 
 ## 🏛️ Hlavní Funkce
@@ -51,7 +49,7 @@ V kořenovém adresáři projektu je připraven spouštěcí skript, který spus
 ```
 *(Skript spouští procesy v izolovaném módu `-I`, což zabraňuje případným konfliktům s jinými instalacemi Pythonu na vašem systému).*
 
-Následně otevřete prohlížeč na adrese:  
+Následně otevřete prohlížeč na adrese:
 👉 **[http://localhost:8501](http://localhost:8501)**
 
 ---

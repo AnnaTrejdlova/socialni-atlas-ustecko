@@ -497,6 +497,180 @@ def generate_distress_indicators_from_cssz():
         with open(indicators_path, "r", encoding="utf-8") as f:
             return json.load(f)
 
+def download_and_generate_cssz_data():
+    """
+    Download real CSSZ datasets for pensioner numbers and quantile distribution.
+    Downscale district-level pensioner statistics to ORP level using 2024 demographic weights
+    and output to data/cssz_data.json and data/cssz_national_quantiles.json.
+    """
+    print("=== Downloading Real Pension Data from ČSSZ ===")
+    
+    DISTRICT_TO_NUTS = {
+        "Děčín": "OK.3502",
+        "Chomutov": "OK.3503",
+        "Litoměřice": "OK.3506",
+        "Louny": "OK.3507",
+        "Most": "OK.3508",
+        "Teplice": "OK.3509",
+        "Ústí nad Labem": "OK.3510"
+    }
+
+    # 1. Load demographics to calculate population weights for ORPs within their respective districts
+    demographics_path = os.path.join("data", "demographics_historical.json")
+    if not os.path.exists(demographics_path):
+        print("Demographics historical data not found. Cannot downscale CSSZ data.")
+        return
+
+    with open(demographics_path, "r", encoding="utf-8") as f:
+        demographics = json.load(f)
+
+    # Extract 2024 population (latest historical year before 2025)
+    orp_pop_2024 = {}
+    for orp in USTI_ORPS:
+        orp_hist = demographics.get(orp, [])
+        pop_2024 = None
+        for entry in orp_hist:
+            if entry.get("year") == 2024:
+                pop_2024 = entry.get("total_pop")
+                break
+        if pop_2024 is None:
+            # Fallback to the last available year
+            for entry in reversed(orp_hist):
+                if entry.get("year") < 2025:
+                    pop_2024 = entry.get("total_pop")
+                    break
+        orp_pop_2024[orp] = pop_2024 or 25000
+
+    # Calculate total population per district
+    district_pop_2024 = {}
+    for orp, district in ORP_TO_DISTRICT.items():
+        district_pop_2024[district] = district_pop_2024.get(district, 0) + orp_pop_2024[orp]
+
+    # 2. Fetch and parse the Pensioners by District CSV
+    url_pensioners = "https://data.cssz.cz/dump/duchodci-v-cr-krajich-okresech.csv"
+    req_p = urllib.request.Request(url_pensioners, headers={'User-Agent': 'Mozilla/5.0'})
+    
+    try:
+        print("Downloading pensioners by district...")
+        with urllib.request.urlopen(req_p) as r:
+            content_p = r.read().decode('utf-8', errors='ignore')
+        
+        f_p = io.StringIO(content_p)
+        delim_p = ';' if ';' in content_p.split('\n')[0] else ','
+        reader_p = csv.DictReader(f_p, delimiter=delim_p)
+        rows_p = list(reader_p)
+        
+        # Find latest reference period
+        periods_p = sorted(list(set(row['referencni_obdobi'] for row in rows_p)))
+        latest_period_p = periods_p[-1]
+        print(f"Latest pensioner period: {latest_period_p}")
+        
+        # Filter for Starobni (PK_OLDAGE_S1), Celkem (T), latest period
+        filtered_p = [
+            row for row in rows_p
+            if row.get('referencni_obdobi') == latest_period_p
+            and row.get('pohlavi_kod') == 'T'
+            and row.get('druh_duchodu_kod') == 'PK_OLDAGE_S1'
+        ]
+        
+        district_data = {}
+        for row in filtered_p:
+            area_code = row.get('referencni_oblast_kod')
+            if area_code in DISTRICT_TO_NUTS.values():
+                district_data[area_code] = {
+                    "recipients": float(row.get('pocet_duchodcu', 0)),
+                    "average_pension": float(row.get('prumerna_vyse_duchodu', 0))
+                }
+    except Exception as e:
+        print(f"Error processing pensioners CSV: {repr(e)}")
+        return
+
+    # 3. Fetch and parse the Quantiles CSV
+    url_quantiles = "https://data.cssz.cz/dump/rozlozeni-souboru-duchodcu-podle-vyse-duchodu-v-kvantilovem-vyjadreni.csv"
+    req_q = urllib.request.Request(url_quantiles, headers={'User-Agent': 'Mozilla/5.0'})
+    
+    try:
+        print("Downloading pension quantiles...")
+        with urllib.request.urlopen(req_q) as r:
+            content_q = r.read().decode('utf-8', errors='ignore')
+            
+        f_q = io.StringIO(content_q)
+        delim_q = ';' if ';' in content_q.split('\n')[0] else ','
+        reader_q = csv.DictReader(f_q, delimiter=delim_q)
+        rows_q = list(reader_q)
+        
+        periods_q = sorted(list(set(row['referencni_obdobi'] for row in rows_q)))
+        latest_period_q = periods_q[-1]
+        print(f"Latest quantiles period: {latest_period_q}")
+        
+        filtered_q = [
+            row for row in rows_q
+            if row.get('referencni_obdobi') == latest_period_q
+            and row.get('druh_duchodu_kod') == 'PK_OLDAGE_S6a'
+        ]
+        
+        quantiles = {}
+        for row in filtered_q:
+            q_code = row.get('kvantil_vyse_duchodu_kod')
+            val = float(row.get('mesicni_vyse_duchodu', 0))
+            if q_code in ['Q10', 'Q50', 'Q90']:
+                quantiles[q_code] = val
+                
+        # Save national quantiles
+        os.makedirs("data", exist_ok=True)
+        quantiles_path = os.path.join("data", "cssz_national_quantiles.json")
+        with open(quantiles_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "quantiles": quantiles,
+                "reference_period": latest_period_q
+            }, f, ensure_ascii=False, indent=2)
+        print(f"Saved {quantiles_path}")
+    except Exception as e:
+        print(f"Error processing quantiles CSV: {repr(e)}")
+        return
+
+    # 4. Perform the downscaling to ORP level and merge with existing sickness statistics
+    cssz_data_path = os.path.join("data", "cssz_data.json")
+    old_cssz = {}
+    if os.path.exists(cssz_data_path):
+        try:
+            with open(cssz_data_path, "r", encoding="utf-8") as f:
+                old_cssz = json.load(f)
+        except Exception:
+            pass
+
+    new_cssz = {}
+    for orp in USTI_ORPS:
+        district = ORP_TO_DISTRICT[orp]
+        nuts_code = DISTRICT_TO_NUTS[district]
+        
+        # Calculate ORP population share
+        orp_pop = orp_pop_2024[orp]
+        dist_pop = district_pop_2024[district]
+        proportion = orp_pop / dist_pop if dist_pop > 0 else 1.0
+        
+        # Get district data or fallback
+        dist_data = district_data.get(nuts_code, {"recipients": 5000.0, "average_pension": 20000.0})
+        
+        recipients = int(dist_data["recipients"] * proportion)
+        average_pension = int(dist_data["average_pension"])
+        
+        # Keep original sickness data if available
+        old_orp = old_cssz.get(orp, {})
+        
+        new_cssz[orp] = {
+            "average_pension": average_pension,
+            "recipients": recipients,
+            "avg_sickness_duration_days": old_orp.get("avg_sickness_duration_days", 42),
+            "sickness_days_total": old_orp.get("sickness_days_total", 200000),
+            "sickness_ratio_pct": old_orp.get("sickness_ratio_pct", 4.5)
+        }
+
+    with open(cssz_data_path, "w", encoding="utf-8") as f:
+        json.dump(new_cssz, f, ensure_ascii=False, indent=2)
+    print(f"Saved downscaled data to {cssz_data_path}")
+
+
 if __name__ == "__main__":
     print("Starting integration of real data from ČSSZ and CSU...")
     social_indicators = generate_distress_indicators_from_cssz()
@@ -511,4 +685,10 @@ if __name__ == "__main__":
     except Exception as e:
         print("Fatal error downloading social services:", repr(e))
 
+    try:
+        download_and_generate_cssz_data()
+    except Exception as e:
+        print("Fatal error downloading and downscaling CSSZ data:", repr(e))
+
     print("Data integration complete!")
+
