@@ -323,8 +323,12 @@ selected_indicator_label = st.sidebar.selectbox(
     [
         "Počet důchodců",
         "Průměrná výše důchodu",
-        "Exekuční srážky důchodců",
+        "Počet pracujících na 1 důchodce",
+        "Důchodci s exekuční srážkou",
+        "Průměrný důchod s exekucí",
+        "Průměrná výše exekuční srážky",
         "Nezaměstnanost",
+        "Míra exekucí v populaci",
         "Kriminalita"
     ]
 )
@@ -332,14 +336,22 @@ selected_indicator_label = st.sidebar.selectbox(
 INDICATOR_MAPPING = {
     "Počet důchodců": ("cssz", "recipients", "osob", "recipients", cm.linear.Blues_09),
     "Průměrná výše důchodu": ("cssz", "average_pension", "Kč", "average_pension", cm.linear.Greens_09),
-    "Exekuční srážky důchodců": ("indicators", "exekuce_rate", "%", "exekuce_rate", cm.linear.OrRd_09),
+    "Počet pracujících na 1 důchodce": ("cssz", "insured_pensioner_ratio", "", "insured_pensioner_ratio", cm.linear.PuBu_09),
+    "Důchodci s exekuční srážkou": ("cssz", "execution_recipients", "osob", "execution_recipients", cm.linear.OrRd_09),
+    "Průměrný důchod s exekucí": ("cssz", "execution_average_pension", "Kč", "execution_average_pension", cm.linear.YlOrBr_09),
+    "Průměrná výše exekuční srážky": ("cssz", "execution_average_deduction", "Kč", "execution_average_deduction", cm.linear.OrRd_09),
     "Nezaměstnanost": ("indicators", "unemployment_rate", "%", "unemployment_rate", cm.linear.YlOrRd_09),
+    "Míra exekucí v populaci": ("indicators", "exekuce_rate", "%", "exekuce_rate", cm.linear.OrRd_09),
     "Kriminalita": ("indicators", "crime_rate_per_1k", "případů", "crime_rate_per_1k", cm.linear.Purples_09)
 }
 
 selected_indicator_source, indicator_key, indicator_unit, indicator_title, colormap_fn = INDICATOR_MAPPING[selected_indicator_label]
 
 def get_indicator_value(orp_name):
+    if selected_indicator_label == "Počet pracujících na 1 důchodce":
+        recipients = cssz_data.get(orp_name, {}).get("recipients", 0)
+        insured = cssz_data.get(orp_name, {}).get("insured_persons", 0)
+        return round(insured / recipients, 2) if recipients > 0 else 0.0
     if selected_indicator_source == "indicators":
         return indicators.get(orp_name, {}).get(indicator_key, 0.0)
     return cssz_data.get(orp_name, {}).get(indicator_key, 0.0)
@@ -348,9 +360,14 @@ def get_indicator_value(orp_name):
 def format_indicator_value(value):
     if value is None:
         return "0"
+    if indicator_key == "insured_pensioner_ratio":
+        try:
+            return f"{float(value):.2f}"
+        except Exception:
+            return str(value)
     if isinstance(value, float) and not value.is_integer():
         return f"{value:.1f}"
-    if indicator_key in ("recipients", "average_pension"):
+    if indicator_key in ("recipients", "average_pension", "execution_recipients", "execution_average_pension", "execution_average_deduction"):
         try:
             return f"{int(value):,}".replace(",", " ")
         except Exception:
@@ -443,39 +460,82 @@ with tab_atlas:
     if selected_orp == "Celý kraj":
         total_pop_2025 = sum(dem[2025-2018]["total_pop"] for dem in fetch_data("/api/orp/demographics").values())
         values = [get_indicator_value(orp_name) for orp_name in indicators.keys()]
-        avg_indicator = round(np.mean(values), 1)
+        avg_indicator = round(np.mean(values), 2 if indicator_key == "insured_pensioner_ratio" else 1)
         max_orp = max(indicators.keys(), key=lambda orp_name: get_indicator_value(orp_name))
         min_orp = min(indicators.keys(), key=lambda orp_name: get_indicator_value(orp_name))
         max_value = get_indicator_value(max_orp)
         min_value = get_indicator_value(min_orp)
-        range_indicator = round(max_value - min_value, 1)
+        range_indicator = round(max_value - min_value, 2 if indicator_key == "insured_pensioner_ratio" else 1)
 
         if selected_indicator_source == "cssz" and indicator_key == "recipients":
             total_recipients = sum(cssz_data.get(orp_name, {}).get("recipients", 0) for orp_name in cssz_data.keys())
-            total_active = 0
-            for orp_name in cssz_data.keys():
-                orp_dem = demographics_data.get(orp_name, [])
-                orp_last = orp_dem[-1] if orp_dem else {}
-                orp_unemp = indicators.get(orp_name, {}).get("unemployment_rate", 0.0)
-                orp_active = int(orp_last.get("pop_15_64", 0) * 0.77 * (1 - orp_unemp / 100))
-                total_active += orp_active
-            ratio = round(total_active / total_recipients, 2) if total_recipients > 0 else 0.0
+            total_insured = sum(cssz_data.get(orp_name, {}).get("insured_persons", 0) for orp_name in cssz_data.keys())
+            ratio = round(total_insured / total_recipients, 2) if total_recipients > 0 else 0.0
 
             with col1:
                 render_metric_card("Důchodci celkem", f"{total_recipients:,}".replace(",", " ") + f" {indicator_unit}", "Celkový počet příjemců důchodů v kraji", "none")
             with col2:
-                render_metric_card("Nejvyšší ORP", f"{max_orp}: {format_value_with_unit(max_value)}", "Nejvyšší počet důchodců", "up")
+                render_metric_card("Nejvyšší ORP", f"{max_orp}:<br>{format_value_with_unit(max_value)}", "Nejvyšší počet důchodců", "up")
             with col3:
-                render_metric_card("Nejnižší ORP", f"{min_orp}: {format_value_with_unit(min_value)}", "Nejnižší počet důchodců", "down")
+                render_metric_card("Nejnižší ORP", f"{min_orp}:<br>{format_value_with_unit(min_value)}", "Nejnižší počet důchodců", "down")
             with col4:
-                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vypočteno z dat ČSÚ (15-64 let)", "none")
+                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vypočteno ze skutečných dat ČSSZ", "none")
+        elif selected_indicator_source == "cssz" and indicator_key == "insured_pensioner_ratio":
+            total_recipients = sum(cssz_data.get(orp_name, {}).get("recipients", 0) for orp_name in cssz_data.keys())
+            total_insured = sum(cssz_data.get(orp_name, {}).get("insured_persons", 0) for orp_name in cssz_data.keys())
+            ratio = round(total_insured / total_recipients, 2) if total_recipients > 0 else 0.0
+
+            with col1:
+                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vážený krajský poměr (ČSSZ)", "none")
+            with col2:
+                render_metric_card("Nejvyšší ORP poměr", f"{max_orp}:<br>{max_value:.2f}", "Nejvíce pracujících na důchodce", "up")
+            with col3:
+                render_metric_card("Nejnižší ORP poměr", f"{min_orp}:<br>{min_value:.2f}", "Nejméně pracujících na důchodce", "down" if min_value < 2.0 else "none")
+            with col4:
+                render_metric_card("Rozpětí poměrů", f"{range_indicator:.2f}", "Rozdíl mezi maximem a minimem ORP", "none")
+        elif selected_indicator_source == "cssz" and indicator_key == "execution_recipients":
+            total_exec = sum(cssz_data.get(orp_name, {}).get("execution_recipients", 0) for orp_name in cssz_data.keys())
+            total_rec = sum(cssz_data.get(orp_name, {}).get("recipients", 0) for orp_name in cssz_data.keys())
+            ratio = round((total_exec / total_rec) * 100, 2) if total_rec > 0 else 0.0
+            with col1:
+                render_metric_card("Důchodci v exekuci celkem", f"{total_exec:,}".replace(",", " ") + f" {indicator_unit}", "Příjemci důchodů s exekuční srážkou v kraji", "none")
+            with col2:
+                render_metric_card("Nejvyšší ORP", f"{max_orp}:<br>{format_value_with_unit(max_value)}", "Nejvyšší počet důchodců v exekuci", "up")
+            with col3:
+                render_metric_card("Nejnižší ORP", f"{min_orp}:<br>{format_value_with_unit(min_value)}", "Nejnižší počet důchodců v exekuci", "down")
+            with col4:
+                render_metric_card("Celkový podíl v kraji", f"{ratio:.2f} %", "Podíl z celkového počtu důchodců v kraji", "none")
+        elif selected_indicator_source == "cssz" and indicator_key == "execution_average_deduction":
+            total_exec = sum(cssz_data.get(orp_name, {}).get("execution_recipients", 0) for orp_name in cssz_data.keys())
+            total_ded = sum(cssz_data.get(orp_name, {}).get("execution_average_deduction", 0) * cssz_data.get(orp_name, {}).get("execution_recipients", 0) for orp_name in cssz_data.keys())
+            avg_ded = round(total_ded / total_exec, 0) if total_exec > 0 else 0.0
+            with col1:
+                render_metric_card("Vážená průměrná srážka", f"{int(avg_ded):,}".replace(",", " ") + f" {indicator_unit}", "Průměrná výše exekuční srážky v kraji", "none")
+            with col2:
+                render_metric_card("Nejvyšší ORP srážka", f"{max_orp}:<br>{format_value_with_unit(max_value)}", "Nejvyšší průměrná srážka", "up")
+            with col3:
+                render_metric_card("Nejnižší ORP srážka", f"{min_orp}:<br>{format_value_with_unit(min_value)}", "Nejnižší průměrná srážka", "down")
+            with col4:
+                render_metric_card("Rozpětí srážek", f"{int(max_value - min_value):,}".replace(",", " ") + f" {indicator_unit}", "Rozdíl mezi maximem a minimem ORP", "none")
+        elif selected_indicator_source == "cssz" and indicator_key == "execution_average_pension":
+            total_exec = sum(cssz_data.get(orp_name, {}).get("execution_recipients", 0) for orp_name in cssz_data.keys())
+            total_pens = sum(cssz_data.get(orp_name, {}).get("execution_average_pension", 0) * cssz_data.get(orp_name, {}).get("execution_recipients", 0) for orp_name in cssz_data.keys())
+            avg_pens = round(total_pens / total_exec, 0) if total_exec > 0 else 0.0
+            with col1:
+                render_metric_card("Vážený průměrný důchod", f"{int(avg_pens):,}".replace(",", " ") + f" {indicator_unit}", "Průměrný důchod lidí s exekucí v kraji", "none")
+            with col2:
+                render_metric_card("Nejvyšší ORP průměr", f"{max_orp}:<br>{format_value_with_unit(max_value)}", "Nejvyšší průměrný důchod s exekucí", "up")
+            with col3:
+                render_metric_card("Nejnižší ORP průměr", f"{min_orp}:<br>{format_value_with_unit(min_value)}", "Nejnižší průměrný důchod s exekucí", "down")
+            with col4:
+                render_metric_card("Rozpětí důchodů", f"{int(max_value - min_value):,}".replace(",", " ") + f" {indicator_unit}", "Rozdíl mezi maximem a minimem ORP", "none")
         else:
             with col1:
                 render_metric_card(f"Průměr {selected_indicator_label}", format_value_with_unit(avg_indicator), "Současný krajský průměr", "none")
             with col2:
-                render_metric_card("Nejvyšší ORP", f"{max_orp}: {format_value_with_unit(max_value)}", "Nejvyšší hodnota v kraji", "up")
+                render_metric_card("Nejvyšší ORP", f"{max_orp}:<br>{format_value_with_unit(max_value)}", "Nejvyšší hodnota v kraji", "up")
             with col3:
-                render_metric_card("Nejnižší ORP", f"{min_orp}: {format_value_with_unit(min_value)}", "Nejnižší hodnota v kraji", "down")
+                render_metric_card("Nejnižší ORP", f"{min_orp}:<br>{format_value_with_unit(min_value)}", "Nejnižší hodnota v kraji", "down")
             with col4:
                 render_metric_card(f"Rozpětí {selected_indicator_label}", format_value_with_unit(range_indicator), f"Rozdíl mezi {max_orp} a {min_orp}", "none")
     else:
@@ -484,8 +544,8 @@ with tab_atlas:
         orp_last = hist_dem[-1] if hist_dem else {}
         orp_unemp = indicators.get(selected_orp, {}).get("unemployment_rate", 0.0)
         indicator_value = get_indicator_value(selected_orp)
-        avg_indicator = round(np.mean([get_indicator_value(orp_name) for orp_name in indicators.keys()]), 1)
-        diff_value = round(indicator_value - avg_indicator, 1)
+        avg_indicator = round(np.mean([get_indicator_value(orp_name) for orp_name in indicators.keys()]), 2 if indicator_key == "insured_pensioner_ratio" else 1)
+        diff_value = round(indicator_value - avg_indicator, 2 if indicator_key == "insured_pensioner_ratio" else 1)
         diff_direction = "up" if diff_value > 0 else "down" if diff_value < 0 else "none"
         diff_text = f"{format_value_with_unit(abs(diff_value))} {'nad' if diff_value > 0 else 'pod' if diff_value < 0 else 've shodě s'} průměrem kraje"
         orp_capacity = sum(s["capacity"] for s in services if s["orp"] == selected_orp)
@@ -497,11 +557,27 @@ with tab_atlas:
         with col3:
             render_metric_card("Rozdíl proti průměru kraje", format_value_with_unit(abs(diff_value)), diff_text, diff_direction)
         with col4:
-            if selected_indicator_source == "cssz" and indicator_key == "recipients":
+            if selected_indicator_source == "cssz" and indicator_key in ("recipients", "insured_pensioner_ratio"):
                 recipients = cssz_data.get(selected_orp, {}).get("recipients", 0)
-                orp_active = int(orp_last.get("pop_15_64", 0) * 0.77 * (1 - orp_unemp / 100))
-                ratio = round(orp_active / recipients, 2) if recipients > 0 else 0.0
-                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vypočteno z dat ČSÚ (15-64 let)", "down" if ratio < 2.0 else "none")
+                insured_persons = cssz_data.get(selected_orp, {}).get("insured_persons", 0)
+                ratio = round(insured_persons / recipients, 2) if recipients > 0 else 0.0
+                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vypočteno ze skutečných dat ČSSZ", "down" if ratio < 2.0 else "none")
+            elif selected_indicator_source == "cssz" and indicator_key == "execution_recipients":
+                recipients = cssz_data.get(selected_orp, {}).get("recipients", 1)
+                exec_recipients = cssz_data.get(selected_orp, {}).get("execution_recipients", 0)
+                pct = round((exec_recipients / recipients) * 100, 2)
+                render_metric_card("Podíl důchodců s exekucí", f"{pct:.2f} %", "Z celkového počtu důchodců v ORP", "up" if pct > 3.0 else "none")
+            elif selected_indicator_source == "cssz" and indicator_key == "execution_average_deduction":
+                avg_pension = cssz_data.get(selected_orp, {}).get("average_pension", 1)
+                avg_ded = cssz_data.get(selected_orp, {}).get("execution_average_deduction", 0)
+                pct = round((avg_ded / avg_pension) * 100, 1)
+                render_metric_card("Podíl srážky z důchodu", f"{pct:.1f} %", "Podíl průměrné srážky z průměrného důchodu", "none")
+            elif selected_indicator_source == "cssz" and indicator_key == "execution_average_pension":
+                avg_pension = cssz_data.get(selected_orp, {}).get("average_pension", 1)
+                avg_exec_pension = cssz_data.get(selected_orp, {}).get("execution_average_pension", 0)
+                pct = round((avg_exec_pension / avg_pension) * 100, 1)
+                diff = avg_pension - avg_exec_pension
+                render_metric_card("Rozdíl oproti běžnému průměru", f"- {diff:,} Kč".replace(",", " "), f"Důchod s exekucí je na {pct:.1f} % běžného průměru", "none")
             else:
                 render_metric_card("Populace 2025", f"{pop_2025:,}".replace(",", " "), "Dle dat ČSÚ", "none")
 
@@ -681,6 +757,146 @@ with tab_atlas:
             yaxis=dict(gridcolor=grid_color)
         )
         st.plotly_chart(fig_comp, width='stretch')
+
+    # ČSSZ Pension and Execution Deep Dive Panel
+    st.markdown("<br/>", unsafe_allow_html=True)
+    with st.expander("📊 HLUBŠÍ ANALÝZA: Starobní důchody a exekuční srážky (ČSSZ)", expanded=True):
+        if selected_orp == "Celý kraj":
+            st.markdown("<h5 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Souhrnné důchodové statistiky za Ústecký kraj</h5>", unsafe_allow_html=True)
+
+            # Global aggregates
+            total_recipients = sum(cssz_data.get(orp, {}).get("recipients", 0) for orp in cssz_data)
+            total_exec_recipients = sum(cssz_data.get(orp, {}).get("execution_recipients", 0) for orp in cssz_data)
+            pension_vol = sum(cssz_data.get(orp, {}).get("average_pension", 0) * cssz_data.get(orp, {}).get("recipients", 0) for orp in cssz_data)
+            avg_pension_weighted = int(pension_vol / total_recipients) if total_recipients > 0 else 0
+
+            exec_pension_vol = sum(cssz_data.get(orp, {}).get("execution_average_pension", 0) * cssz_data.get(orp, {}).get("execution_recipients", 0) for orp in cssz_data)
+            avg_exec_pension_weighted = int(exec_pension_vol / total_exec_recipients) if total_exec_recipients > 0 else 0
+
+            exec_ded_vol = sum(cssz_data.get(orp, {}).get("execution_average_deduction", 0) * cssz_data.get(orp, {}).get("execution_recipients", 0) for orp in cssz_data)
+            avg_exec_ded_weighted = int(exec_ded_vol / total_exec_recipients) if total_exec_recipients > 0 else 0
+
+            pct_exec = round((total_exec_recipients / total_recipients) * 100, 2) if total_recipients > 0 else 0.0
+
+            # National Quantiles comparison
+            q10 = cssz_quantiles.get("quantiles", {}).get("Q10", 15584.0)
+            q50 = cssz_quantiles.get("quantiles", {}).get("Q50", 20584.0)
+            q90 = cssz_quantiles.get("quantiles", {}).get("Q90", 25654.0)
+            ref_period = cssz_quantiles.get("reference_period", "2024-12-31")
+
+            col_d1, col_d2 = st.columns([1, 1])
+            with col_d1:
+                st.markdown(f"""
+                <div style='background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); height: 100%;'>
+                    <h6 style='color: #4285f4; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;'>Regionální přehled (ČSSZ)</h6>
+                    <table style='width: 100%; font-size: 0.9rem; border-collapse: collapse; color: var(--text-color);'>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Počet starobních důchodců:</td><td style='text-align: right; font-weight: 700;'>{total_recipients:,} osob</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Průměrný starobní důchod:</td><td style='text-align: right; font-weight: 700; color: #00cc96;'>{avg_pension_weighted:,} Kč</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Počet důchodců s exekucí:</td><td style='text-align: right; font-weight: 700;'>{total_exec_recipients:,} osob</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Podíl důchodců s exekucí:</td><td style='text-align: right; font-weight: 700; color: #ff4b4b;'>{pct_exec:.2f} %</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Průměrný důchod s exekucí:</td><td style='text-align: right; font-weight: 700;'>{avg_exec_pension_weighted:,} Kč</td></tr>
+                        <tr><td style='padding: 8px 0; color: var(--metric-label-color);'>Průměrná exekuční srážka:</td><td style='text-align: right; font-weight: 700; color: #ff4b4b;'>{avg_exec_ded_weighted:,} Kč</td></tr>
+                    </table>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with col_d2:
+                st.markdown(f"""
+                <div style='background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); height: 100%;'>
+                    <h6 style='color: #4285f4; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;'>Srovnání s celostátním průměrem (k {ref_period})</h6>
+                    <p style='font-size: 0.85rem; color: var(--metric-label-color); margin-bottom: 15px;'>Průměrný důchod v kraji ({avg_pension_weighted:,} Kč) v porovnání s celostátním rozdělením starobních důchodů:</p>
+                    <div style='margin-bottom: 12px;'>
+                        <div style='display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);'>
+                            <span>Spodních 10 % (Q10: {int(q10):,} Kč)</span>
+                            <span style='font-weight:700;'>+{max(0, avg_pension_weighted - int(q10)):,} Kč nad</span>
+                        </div>
+                        <div style='background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;'>
+                            <div style='background: #dc3545; width: {min(100, int(avg_pension_weighted/q10*100)) if q10 > 0 else 0}%; height: 100%;'></div>
+                        </div>
+                    </div>
+                    <div style='margin-bottom: 12px;'>
+                        <div style='display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);'>
+                            <span>Mediánový důchod (Q50: {int(q50):,} Kč)</span>
+                            <span style='font-weight:700;'>{round(avg_pension_weighted/q50*100, 1)} % mediánu</span>
+                        </div>
+                        <div style='background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;'>
+                            <div style='background: #ff9f1c; width: {min(100, int(avg_pension_weighted/q50*100)) if q50 > 0 else 0}%; height: 100%;'></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style='display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);'>
+                            <span>Nejvyšších 10 % (Q90: {int(q90):,} Kč)</span>
+                            <span style='font-weight:700;'>{round(avg_pension_weighted/q90*100, 1)} % úrovně</span>
+                        </div>
+                        <div style='background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;'>
+                            <div style='background: #2ec4b6; width: {min(100, int(avg_pension_weighted/q90*100)) if q90 > 0 else 0}%; height: 100%;'></div>
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            orp_data = cssz_data.get(selected_orp, {})
+            avg_pension = orp_data.get("average_pension", 0)
+            recipients = orp_data.get("recipients", 0)
+            exec_recipients = orp_data.get("execution_recipients", 0)
+            exec_pension = orp_data.get("execution_average_pension", 0)
+            exec_deduction = orp_data.get("execution_average_deduction", 0)
+
+            payout_after_deduction = exec_pension - exec_deduction
+            pct_exec = round((exec_recipients / recipients) * 100, 2) if recipients > 0 else 0.0
+
+            q10 = cssz_quantiles.get("quantiles", {}).get("Q10", 15584.0)
+            q50 = cssz_quantiles.get("quantiles", {}).get("Q50", 20584.0)
+            q90 = cssz_quantiles.get("quantiles", {}).get("Q90", 25654.0)
+            ref_period = cssz_quantiles.get("reference_period", "2024-12-31")
+
+            st.markdown(f"<h5 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Důchodová a exekuční situace v ORP {selected_orp}</h5>", unsafe_allow_html=True)
+
+            col_d1, col_d2 = st.columns([1, 1])
+            with col_d1:
+                st.markdown(f"""
+                <div style='background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); height: 100%;'>
+                    <h6 style='color: #4285f4; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;'>Statistiky pro ORP {selected_orp}</h6>
+                    <table style='width: 100%; font-size: 0.9rem; border-collapse: collapse; color: var(--text-color);'>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Počet starobních důchodců:</td><td style='text-align: right; font-weight: 700;'>{recipients:,} osob</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Průměrný starobní důchod:</td><td style='text-align: right; font-weight: 700; color: #00cc96;'>{avg_pension:,} Kč</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Počet důchodců s exekucí:</td><td style='text-align: right; font-weight: 700;'>{exec_recipients:,} osob</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Podíl důchodců s exekucí:</td><td style='text-align: right; font-weight: 700; color: #ff4b4b;'>{pct_exec:.2f} %</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Průměrný důchod v exekuci:</td><td style='text-align: right; font-weight: 700;'>{exec_pension:,} Kč</td></tr>
+                        <tr style='border-bottom: 1px solid var(--tab-border);'><td style='padding: 8px 0; color: var(--metric-label-color);'>Průměrná exekuční srážka:</td><td style='text-align: right; font-weight: 700; color: #ff4b4b;'>{exec_deduction:,} Kč</td></tr>
+                        <tr style='border-top: 1px solid var(--sidebar-hr);'><td style='padding: 10px 0 0 0; color: var(--metric-label-color); font-weight: 600;'>Zůstatek po srážce:</td><td style='padding: 10px 0 0 0; text-align: right; font-weight: 800; color: #ffbe0b; font-size: 1.05rem;'>{payout_after_deduction:,} Kč</td></tr>
+                    </table>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with col_d2:
+                st.markdown(f"""
+                <div style='background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--card-border); height: 100%;'>
+                    <h6 style='color: #4285f4; margin: 0 0 12px 0; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px;'>Srovnání s celostátním průměrem (k {ref_period})</h6>
+                    <p style='font-size: 0.85rem; color: var(--metric-label-color); margin-bottom: 12px;'>Srovnání průměrného důchodu v ORP ({avg_pension:,} Kč) a čistého zůstatku po exekuci ({payout_after_deduction:,} Kč) s celostátním rozdělením:</p>
+                    <div style='margin-bottom: 10px;'>
+                        <div style='display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);'>
+                            <span>Průměrný důchod v ORP vs Medián (Q50: {int(q50):,} Kč)</span>
+                            <span style='font-weight:700;'>{round(avg_pension/q50*100, 1)} %</span>
+                        </div>
+                        <div style='background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;'>
+                            <div style='background: #00cc96; width: {min(100, int(avg_pension/q50*100)) if q50 > 0 else 0}%; height: 100%;'></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style='display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);'>
+                            <span>Zůstatek po srážce vs Spodních 10 % (Q10: {int(q10):,} Kč)</span>
+                            <span style='font-weight:700; color: #ff4b4b;'>{round(payout_after_deduction/q10*100, 1)} % úrovně Q10</span>
+                        </div>
+                        <div style='background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;'>
+                            <div style='background: #dc3545; width: {min(100, int(payout_after_deduction/q10*100)) if q10 > 0 else 0}%; height: 100%;'></div>
+                        </div>
+                    </div>
+                    <p style='font-size: 0.75rem; color: var(--metric-label-color); margin-top: 15px; line-height: 1.4;'>
+                        ⚠️ <strong>Poznámka k exekucím:</strong> Průměrný zůstatek po srážce ({payout_after_deduction:,} Kč) u starobních důchodců v exekuci v ORP {selected_orp} se nebezpečně blíží nebo spadat pod hranici spodních 10 % celostátní distribuce důchodů. Senioři s exekučními srážkami v této lokalitě představují vysoce zranitelnou skupinu ohroženou extrémní chudobou.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
 # ----------------- TAB 2: PREDIKTIVNÍ MODEL -----------------
 with tab_predictions:

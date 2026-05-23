@@ -4,78 +4,78 @@
     "orp": "Litvínov",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Žižkova, 151, 43601",
-    "lat": 50.60388,
-    "lon": 13.61827,
+    "lat": 50.60419,
+    "lon": 13.61894,
     "capacity": 30,
-    "filled": 29
+    "filled": 28
   },
   {
     "name": "Městský ústav sociálních služeb Klášterec nad Ohří, příspěvková organizace",
     "orp": "Kadaň",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Lípová, 545, 43151",
-    "lat": 50.37277,
-    "lon": 13.27547,
+    "lat": 50.37831,
+    "lon": 13.27015,
     "capacity": 113,
-    "filled": 104
+    "filled": 109
   },
   {
     "name": "Domov důchodců Roudnice nad Labem, příspěvková organizace",
     "orp": "Roudnice nad Labem",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Sámova, 2481, 41301",
-    "lat": 50.41244,
-    "lon": 14.24309,
+    "lat": 50.43048,
+    "lon": 14.24102,
     "capacity": 36,
-    "filled": 34
+    "filled": 33
   },
   {
     "name": "Domov pro seniory a pečovatelská služba v Žatci",
     "orp": "Žatec",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Šafaříkova, 852, 43801",
-    "lat": 50.33718,
-    "lon": 13.5374,
+    "lat": 50.34102,
+    "lon": 13.54405,
     "capacity": 80,
-    "filled": 74
+    "filled": 75
   },
   {
     "name": "Domov pro seniory Písečná (DpS Písečná)",
     "orp": "Chomutov",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Písečná, 5062, 43004",
-    "lat": 50.45024,
-    "lon": 13.40765,
+    "lat": 50.47565,
+    "lon": 13.43136,
     "capacity": 166,
-    "filled": 157
+    "filled": 153
   },
   {
     "name": "Domovy sociálních služeb Litvínov, příspěvková organizace",
     "orp": "Litvínov",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Křížatecká, 16, 43542",
-    "lat": 50.59581,
-    "lon": 13.61416,
+    "lat": 50.59569,
+    "lon": 13.6163,
     "capacity": 117,
-    "filled": 114
+    "filled": 108
   },
   {
     "name": "Farní charita Litoměřice, Domov na Dómském pahorku - týdenní stacionář",
     "orp": "Litoměřice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Zahradnická, 1534/4, 41201",
-    "lat": 50.54351,
-    "lon": 14.13465,
+    "lat": 50.51651,
+    "lon": 14.14376,
     "capacity": 118,
-    "filled": 113
+    "filled": 115
   },
   {
     "name": "Charitní domov sv. Zdislava",
     "orp": "Litoměřice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Dominikánské náměstí, 92/1, 41201",
-    "lat": 50.54487,
-    "lon": 14.11798,
+    "lat": 50.53872,
+    "lon": 14.14295,
     "capacity": 5,
     "filled": 4
   },
@@ -84,28 +84,28 @@
     "orp": "Podbořany",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Nádražní, 933, 44101",
-    "lat": 50.21556,
-    "lon": 13.42099,
+    "lat": 50.21487,
+    "lon": 13.41455,
     "capacity": 69,
-    "filled": 66
+    "filled": 65
   },
   {
     "name": "Domov pro seniory a Domov pro osoby se zdravotním postižením Mašťov",
     "orp": "Kadaň",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Sídliště, 232, 43156",
-    "lat": 50.38866,
-    "lon": 13.25751,
+    "lat": 50.38025,
+    "lon": 13.26675,
     "capacity": 42,
-    "filled": 40
+    "filled": 39
   },
   {
     "name": "Domov se zvláštním režimem",
     "orp": "Ústí nad Labem",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Klášterní, 2, 40323",
-    "lat": 50.65357,
-    "lon": 14.02495,
+    "lat": 50.67195,
+    "lon": 14.04334,
     "capacity": 17,
     "filled": 16
   },
@@ -114,8 +114,8 @@
     "orp": "Roudnice nad Labem",
     "type": "Stationary Care (Home for Seniors)",
     "address": "58, 41187",
-    "lat": 50.43401,
-    "lon": 14.24481,
+    "lat": 50.43156,
+    "lon": 14.24166,
     "capacity": 28,
     "filled": 26
   },
@@ -124,8 +124,8 @@
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "68, 40745",
-    "lat": 50.77962,
-    "lon": 14.21852,
+    "lat": 50.76599,
+    "lon": 14.21631,
     "capacity": 4,
     "filled": 3
   },
@@ -134,48 +134,48 @@
     "orp": "Kadaň",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Věžní, 958, 43201",
-    "lat": 50.38158,
-    "lon": 13.28573,
+    "lat": 50.37399,
+    "lon": 13.27755,
     "capacity": 95,
-    "filled": 90
+    "filled": 91
   },
   {
     "name": "Domov pro seniory Šluknov",
     "orp": "Rumburk",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Křečanská, 573, 40777",
-    "lat": 50.94634,
-    "lon": 14.53888,
+    "lat": 50.94459,
+    "lon": 14.5662,
     "capacity": 70,
-    "filled": 65
+    "filled": 66
   },
   {
     "name": "Domov důchodců Bystřany",
     "orp": "Teplice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Pražská, 236",
-    "lat": 50.63649,
-    "lon": 13.84775,
+    "lat": 50.629,
+    "lon": 13.85134,
     "capacity": 100,
-    "filled": 94
+    "filled": 95
   },
   {
     "name": "Domov pro seniory Chlumec, příspěvková organizace",
     "orp": "Ústí nad Labem",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Pod Horkou, 85, 40339",
-    "lat": 50.6542,
-    "lon": 14.0517,
+    "lat": 50.64744,
+    "lon": 14.0309,
     "capacity": 65,
-    "filled": 60
+    "filled": 62
   },
   {
     "name": "Domov pro seniory",
     "orp": "Rumburk",
     "type": "Stationary Care (Home for Seniors)",
     "address": "65, 40753",
-    "lat": 50.95008,
-    "lon": 14.55962,
+    "lat": 50.95211,
+    "lon": 14.53794,
     "capacity": 17,
     "filled": 16
   },
@@ -184,58 +184,58 @@
     "orp": "Litvínov",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Okružní, 104, 43513",
-    "lat": 50.58554,
-    "lon": 13.61105,
+    "lat": 50.58099,
+    "lon": 13.60913,
     "capacity": 45,
-    "filled": 43
+    "filled": 41
   },
   {
     "name": "Domov důchodců Dubí, příspěvková organizace",
     "orp": "Teplice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Na Výšině, 494, 41701",
-    "lat": 50.64951,
-    "lon": 13.85044,
+    "lat": 50.64485,
+    "lon": 13.82814,
     "capacity": 137,
-    "filled": 133
+    "filled": 129
   },
   {
     "name": "Domov důchodců Libochovice",
     "orp": "Lovosice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Vrchlického, 574, 41117",
-    "lat": 50.50477,
-    "lon": 14.04013,
+    "lat": 50.51944,
+    "lon": 14.04474,
     "capacity": 29,
-    "filled": 27
+    "filled": 28
   },
   {
     "name": "Domov U Trati Litoměřice",
     "orp": "Litoměřice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "U Trati, 2041/3, 41201",
-    "lat": 50.52686,
-    "lon": 14.13076,
+    "lat": 50.53627,
+    "lon": 14.14388,
     "capacity": 68,
-    "filled": 63
+    "filled": 66
   },
   {
     "name": "Domov pro seniory",
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Kamenická, 755/195, 40502",
-    "lat": 50.78528,
-    "lon": 14.19722,
+    "lat": 50.77356,
+    "lon": 14.20376,
     "capacity": 42,
-    "filled": 41
+    "filled": 40
   },
   {
     "name": "Dům pokojného stáří sv. Ludmily",
     "orp": "Ústí nad Labem",
     "type": "Stationary Care (Home for Seniors)",
     "address": "V Aleji, 434, 40317",
-    "lat": 50.65637,
-    "lon": 14.03129,
+    "lat": 50.649,
+    "lon": 14.03789,
     "capacity": 12,
     "filled": 11
   },
@@ -244,28 +244,28 @@
     "orp": "Louny",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Rakovnická, 2502, 44001",
-    "lat": 50.35218,
-    "lon": 13.7839,
+    "lat": 50.35829,
+    "lon": 13.7879,
     "capacity": 129,
-    "filled": 123
+    "filled": 122
   },
   {
     "name": "Sociální služby města Loun, příspěvková organizace",
     "orp": "Louny",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Rakovnická, 2502, 44001",
-    "lat": 50.34902,
-    "lon": 13.78542,
+    "lat": 50.36136,
+    "lon": 13.79862,
     "capacity": 129,
-    "filled": 122
+    "filled": 125
   },
   {
     "name": "Centrum \"Rodina v tísni\" - Dům na půl cesty",
     "orp": "Teplice",
     "type": "Field Care (Home Nursing)",
     "address": "Husova, 305, 41705",
-    "lat": 50.63394,
-    "lon": 13.83909,
+    "lat": 50.62885,
+    "lon": 13.85402,
     "capacity": 4,
     "filled": 3
   },
@@ -274,28 +274,28 @@
     "orp": "Most",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Barvířská, 495, 43401",
-    "lat": 50.49706,
-    "lon": 13.64725,
+    "lat": 50.49597,
+    "lon": 13.6272,
     "capacity": 268,
-    "filled": 248
+    "filled": 259
   },
   {
     "name": "Domov pro seniory",
     "orp": "Most",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Antonína Dvořáka, 2166/51, 43401",
-    "lat": 50.49412,
-    "lon": 13.65059,
+    "lat": 50.51319,
+    "lon": 13.62556,
     "capacity": 35,
-    "filled": 33
+    "filled": 32
   },
   {
     "name": "Domov pro seniory",
     "orp": "Most",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Jiřího Wolkera, 404, 43401",
-    "lat": 50.50157,
-    "lon": 13.62425,
+    "lat": 50.51068,
+    "lon": 13.63868,
     "capacity": 96,
     "filled": 88
   },
@@ -304,38 +304,38 @@
     "orp": "Chomutov",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Mládežnická, 1753, 43111",
-    "lat": 50.4499,
-    "lon": 13.42722,
+    "lat": 50.46932,
+    "lon": 13.41406,
     "capacity": 90,
-    "filled": 83
+    "filled": 86
   },
   {
     "name": "Domov pro seniory a pečovatelská služba Česká Kamenice, příspěvková organizace",
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Sládkova, 344, 40721",
-    "lat": 50.77901,
-    "lon": 14.20604,
+    "lat": 50.77592,
+    "lon": 14.19964,
     "capacity": 68,
-    "filled": 64
+    "filled": 63
   },
   {
     "name": "Terapeutická komunita WHITE LIGHT I",
     "orp": "Litoměřice",
     "type": "Shelter & Social Prevention",
     "address": "53, 41145",
-    "lat": 50.52872,
-    "lon": 14.13836,
+    "lat": 50.53239,
+    "lon": 14.12693,
     "capacity": 15,
-    "filled": 14
+    "filled": 13
   },
   {
     "name": "Domov pro seniory Dukla",
     "orp": "Kadaň",
     "type": "Stationary Care (Home for Seniors)",
     "address": "S. K. Neumanna, 842/2, 43191",
-    "lat": 50.38449,
-    "lon": 13.26956,
+    "lat": 50.37467,
+    "lon": 13.276,
     "capacity": 28,
     "filled": 26
   },
@@ -344,18 +344,18 @@
     "orp": "Litoměřice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Kréta, 301, 41155",
-    "lat": 50.51838,
-    "lon": 14.11636,
+    "lat": 50.53273,
+    "lon": 14.12327,
     "capacity": 20,
-    "filled": 19
+    "filled": 18
   },
   {
     "name": "Domov pro seniory",
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Čsl. armády, 621/25, 40502",
-    "lat": 50.76784,
-    "lon": 14.21538,
+    "lat": 50.77994,
+    "lon": 14.21487,
     "capacity": 9,
     "filled": 8
   },
@@ -364,8 +364,8 @@
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Škroupova, 302/17, 40502",
-    "lat": 50.76101,
-    "lon": 14.21538,
+    "lat": 50.77308,
+    "lon": 14.19535,
     "capacity": 11,
     "filled": 10
   },
@@ -374,8 +374,8 @@
     "orp": "Most",
     "type": "Field Care (Home Nursing)",
     "address": "Chomutovská, 2261/2, 43401",
-    "lat": 50.49406,
-    "lon": 13.64565,
+    "lat": 50.51352,
+    "lon": 13.62923,
     "capacity": 11,
     "filled": 10
   },
@@ -384,8 +384,8 @@
     "orp": "Litvínov",
     "type": "Field Care (Home Nursing)",
     "address": "U Jezera, 1, 43401",
-    "lat": 50.59287,
-    "lon": 13.61314,
+    "lat": 50.59964,
+    "lon": 13.62392,
     "capacity": 5,
     "filled": 4
   },
@@ -394,8 +394,8 @@
     "orp": "Varnsdorf",
     "type": "Stationary Care (Home for Seniors)",
     "address": "302, 40744",
-    "lat": 50.90034,
-    "lon": 14.62755,
+    "lat": 50.90424,
+    "lon": 14.61321,
     "capacity": 44,
     "filled": 42
   },
@@ -404,48 +404,48 @@
     "orp": "Teplice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Ruská, 292/2a, 41703",
-    "lat": 50.64881,
-    "lon": 13.83172,
+    "lat": 50.62775,
+    "lon": 13.84472,
     "capacity": 49,
-    "filled": 48
+    "filled": 45
   },
   {
     "name": "Domov pro seniory",
     "orp": "Teplice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Ruská, 326/2b, 41703",
-    "lat": 50.62646,
-    "lon": 13.84141,
+    "lat": 50.63453,
+    "lon": 13.8406,
     "capacity": 21,
-    "filled": 20
+    "filled": 19
   },
   {
     "name": "Sestřičky s. r. o.",
     "orp": "Most",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Antonína Dvořáka, 2430/18, 43401",
-    "lat": 50.49812,
-    "lon": 13.64152,
+    "lat": 50.49546,
+    "lon": 13.64763,
     "capacity": 17,
-    "filled": 15
+    "filled": 16
   },
   {
     "name": "SENECURA SENIORCENTRUM TEREZÍN",
     "orp": "Litoměřice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Kréta, 301, 41155",
-    "lat": 50.54044,
-    "lon": 14.1222,
+    "lat": 50.53625,
+    "lon": 14.14205,
     "capacity": 40,
-    "filled": 38
+    "filled": 37
   },
   {
     "name": "Dům na půl cesty  \"Do života\"",
     "orp": "Most",
     "type": "Field Care (Home Nursing)",
     "address": "K. H. Borovského, 1146/2, 43401",
-    "lat": 50.51823,
-    "lon": 13.63407,
+    "lat": 50.50212,
+    "lon": 13.63567,
     "capacity": 3,
     "filled": 2
   },
@@ -454,28 +454,28 @@
     "orp": "Litvínov",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Dělnická, 109, 43513",
-    "lat": 50.58281,
-    "lon": 13.6285,
+    "lat": 50.60765,
+    "lon": 13.61997,
     "capacity": 42,
-    "filled": 39
+    "filled": 40
   },
   {
     "name": "Valerie-Homecare, s. r. o.",
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Škroupova, 302/17, 40502",
-    "lat": 50.76165,
-    "lon": 14.19557,
+    "lat": 50.76916,
+    "lon": 14.20082,
     "capacity": 17,
-    "filled": 16
+    "filled": 15
   },
   {
     "name": "ADP-ANNA s.r.o.",
     "orp": "Děčín",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Čsl. armády, 621/25, 40502",
-    "lat": 50.76176,
-    "lon": 14.21317,
+    "lat": 50.77188,
+    "lon": 14.21086,
     "capacity": 9,
     "filled": 8
   },
@@ -484,18 +484,18 @@
     "orp": "Teplice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Ruská, 292/2a, 41703",
-    "lat": 50.62582,
-    "lon": 13.84348,
+    "lat": 50.63517,
+    "lon": 13.84976,
     "capacity": 49,
-    "filled": 45
+    "filled": 46
   },
   {
     "name": "Seniorcentrum Pohoda II.",
     "orp": "Teplice",
     "type": "Stationary Care (Home for Seniors)",
     "address": "Ruská, 326/2b, 41703",
-    "lat": 50.62642,
-    "lon": 13.84301,
+    "lat": 50.62656,
+    "lon": 13.84256,
     "capacity": 23,
     "filled": 21
   }

@@ -1,3 +1,4 @@
+import sys
 import os
 import json
 import urllib.request
@@ -6,6 +7,10 @@ import csv
 import io
 import random
 import numpy as np
+
+# Reconfigure stdout to use utf-8 to prevent encoding errors on Windows terminal
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 def clean_ascii(text):
     mapping = {
@@ -109,55 +114,6 @@ def parse_age(vek_txt):
         return int(match.group(0))
     return None
 
-
-def download_execution_rates():
-    """
-    Download execution rate data from ČSSZ by district and aggregate to ORP level.
-    Returns a dictionary of ORP -> execution_rate (percent)
-    """
-    print("=== Downloading Execution Rates from ČSSZ ===")
-
-    # ČSSZ data portal URLs for execution statistics by district
-    # Based on the catalogue: "Počet důchodců s exekuční srážkou podle okresů"
-    # Since direct API access is limited, we'll construct synthetic data from seed values
-    # In a production system, you'd query ČSSZ data.cssz.cz API directly
-
-    execution_data = {}
-
-    try:
-        # Try to fetch district-level execution data from ČSSZ
-        # This is a simplified approach - actual URLs may vary
-        cssz_base_url = "https://data.cssz.cz"
-
-        # For now, use seed data as fallback with slight adjustments
-        # In production, implement proper ČSSZ API calls
-        print("Note: Direct ČSSZ API integration pending. Using seed baseline with regional adjustments.")
-
-        district_execution_rates = {
-            "Chomutov": 17.0,
-            "Děčín": 14.5,
-            "Litoměřice": 8.0,
-            "Louny": 10.0,
-            "Most": 17.0,
-            "Teplice": 13.0,
-            "Ústí nad Labem": 14.0
-        }
-
-        # Aggregate district data to ORP level
-        # For ORPs in the same district, apply slight variance
-        for orp, district in ORP_TO_DISTRICT.items():
-            base_rate = district_execution_rates.get(district, 12.0)
-            # Add small variance within ±15% for realistic ORP-level differences
-            variance = random.uniform(-0.15, 0.15) * base_rate
-            execution_data[orp] = round(base_rate + variance, 1)
-
-        print(f"Execution rates aggregated for {len(execution_data)} ORPs by district")
-        return execution_data
-
-    except Exception as e:
-        print(f"Error downloading execution rates: {repr(e)}")
-        print("Falling back to seed data.")
-        return {}
 
 
 def download_demographics(social_indicators):
@@ -504,7 +460,7 @@ def download_and_generate_cssz_data():
     and output to data/cssz_data.json and data/cssz_national_quantiles.json.
     """
     print("=== Downloading Real Pension Data from ČSSZ ===")
-    
+
     DISTRICT_TO_NUTS = {
         "Děčín": "OK.3502",
         "Chomutov": "OK.3503",
@@ -549,22 +505,22 @@ def download_and_generate_cssz_data():
     # 2. Fetch and parse the Pensioners by District CSV
     url_pensioners = "https://data.cssz.cz/dump/duchodci-v-cr-krajich-okresech.csv"
     req_p = urllib.request.Request(url_pensioners, headers={'User-Agent': 'Mozilla/5.0'})
-    
+
     try:
         print("Downloading pensioners by district...")
         with urllib.request.urlopen(req_p) as r:
             content_p = r.read().decode('utf-8', errors='ignore')
-        
+
         f_p = io.StringIO(content_p)
         delim_p = ';' if ';' in content_p.split('\n')[0] else ','
         reader_p = csv.DictReader(f_p, delimiter=delim_p)
         rows_p = list(reader_p)
-        
+
         # Find latest reference period
         periods_p = sorted(list(set(row['referencni_obdobi'] for row in rows_p)))
         latest_period_p = periods_p[-1]
         print(f"Latest pensioner period: {latest_period_p}")
-        
+
         # Filter for Starobni (PK_OLDAGE_S1), Celkem (T), latest period
         filtered_p = [
             row for row in rows_p
@@ -572,7 +528,7 @@ def download_and_generate_cssz_data():
             and row.get('pohlavi_kod') == 'T'
             and row.get('druh_duchodu_kod') == 'PK_OLDAGE_S1'
         ]
-        
+
         district_data = {}
         for row in filtered_p:
             area_code = row.get('referencni_oblast_kod')
@@ -585,37 +541,111 @@ def download_and_generate_cssz_data():
         print(f"Error processing pensioners CSV: {repr(e)}")
         return
 
+    # 2.5 Fetch and parse the Execution Deductions CSV
+    url_executions = "https://data.cssz.cz/dump/pocet-duchodcu-s-exekucni-srazkou-podle-okresu.csv"
+    req_e = urllib.request.Request(url_executions, headers={'User-Agent': 'Mozilla/5.0'})
+
+    execution_district_data = {}
+    try:
+        print("Downloading execution deductions by district...")
+        with urllib.request.urlopen(req_e) as r:
+            content_e = r.read().decode('utf-8', errors='ignore')
+
+        f_e = io.StringIO(content_e)
+        delim_e = ';' if ';' in content_e.split('\n')[0] else ','
+        reader_e = csv.DictReader(f_e, delimiter=delim_e)
+        rows_e = list(reader_e)
+
+        # Find latest reference period
+        periods_e = sorted(list(set(row['datum'] for row in rows_e)))
+        latest_period_e = periods_e[-1]
+        print(f"Latest execution period: {latest_period_e}")
+
+        # Filter for Starobni (PK_OLDAGE_S8), Celkem (T), latest period
+        filtered_e = [
+            row for row in rows_e
+            if row.get('datum') == latest_period_e
+            and row.get('pohlavi_kod') == 'T'
+            and row.get('druh_duchodu_kod') == 'PK_OLDAGE_S8'
+        ]
+
+        for row in filtered_e:
+            area_code = row.get('okres_kod')
+            if area_code in DISTRICT_TO_NUTS.values():
+                execution_district_data[area_code] = {
+                    "recipients": float(row.get('pocet_duchodcu', 0)),
+                    "average_pension": float(row.get('prumerna_vyse_duchodu', 0)),
+                    "average_deduction": float(row.get('prumerna_vyse_srazky', 0))
+                }
+    except Exception as e:
+        print(f"Error processing execution deductions CSV: {repr(e)}")
+
+    # 2.75 Fetch and parse the Insured Persons by District CSV
+    url_insured = "https://data.cssz.cz/dump/prehled-o-poctu-zamestnavatelu-pojistencu-a-pojistnych-vztahu-podle-okresu.csv"
+    req_i = urllib.request.Request(url_insured, headers={'User-Agent': 'Mozilla/5.0'})
+
+    insured_district_data = {}
+    try:
+        print("Downloading insured persons by district...")
+        with urllib.request.urlopen(req_i) as r:
+            content_i = r.read().decode('utf-8', errors='ignore')
+
+        f_i = io.StringIO(content_i)
+        delim_i = ';' if ';' in content_i.split('\n')[0] else ','
+        reader_i = csv.DictReader(f_i, delimiter=delim_i)
+        rows_i = list(reader_i)
+
+        # Find latest reference period
+        periods_i = sorted(list(set(row['datum'] for row in rows_i)))
+        latest_period_i = periods_i[-1]
+        print(f"Latest insured persons period: {latest_period_i}")
+
+        # Filter for latest period
+        filtered_i = [
+            row for row in rows_i
+            if row.get('datum') == latest_period_i
+        ]
+
+        for row in filtered_i:
+            area_code = row.get('okres_kod')
+            if area_code in DISTRICT_TO_NUTS.values():
+                insured_district_data[area_code] = {
+                    "insured_persons": float(row.get('pocet_pojistencu', 0))
+                }
+    except Exception as e:
+        print(f"Error processing insured persons CSV: {repr(e)}")
+
     # 3. Fetch and parse the Quantiles CSV
     url_quantiles = "https://data.cssz.cz/dump/rozlozeni-souboru-duchodcu-podle-vyse-duchodu-v-kvantilovem-vyjadreni.csv"
     req_q = urllib.request.Request(url_quantiles, headers={'User-Agent': 'Mozilla/5.0'})
-    
+
     try:
         print("Downloading pension quantiles...")
         with urllib.request.urlopen(req_q) as r:
             content_q = r.read().decode('utf-8', errors='ignore')
-            
+
         f_q = io.StringIO(content_q)
         delim_q = ';' if ';' in content_q.split('\n')[0] else ','
         reader_q = csv.DictReader(f_q, delimiter=delim_q)
         rows_q = list(reader_q)
-        
+
         periods_q = sorted(list(set(row['referencni_obdobi'] for row in rows_q)))
         latest_period_q = periods_q[-1]
         print(f"Latest quantiles period: {latest_period_q}")
-        
+
         filtered_q = [
             row for row in rows_q
             if row.get('referencni_obdobi') == latest_period_q
             and row.get('druh_duchodu_kod') == 'PK_OLDAGE_S6a'
         ]
-        
+
         quantiles = {}
         for row in filtered_q:
             q_code = row.get('kvantil_vyse_duchodu_kod')
             val = float(row.get('mesicni_vyse_duchodu', 0))
             if q_code in ['Q10', 'Q50', 'Q90']:
                 quantiles[q_code] = val
-                
+
         # Save national quantiles
         os.makedirs("data", exist_ok=True)
         quantiles_path = os.path.join("data", "cssz_national_quantiles.json")
@@ -643,27 +673,39 @@ def download_and_generate_cssz_data():
     for orp in USTI_ORPS:
         district = ORP_TO_DISTRICT[orp]
         nuts_code = DISTRICT_TO_NUTS[district]
-        
+
         # Calculate ORP population share
         orp_pop = orp_pop_2024[orp]
         dist_pop = district_pop_2024[district]
         proportion = orp_pop / dist_pop if dist_pop > 0 else 1.0
-        
+
         # Get district data or fallback
         dist_data = district_data.get(nuts_code, {"recipients": 5000.0, "average_pension": 20000.0})
-        
+        exec_dist_data = execution_district_data.get(nuts_code, {"recipients": 200.0, "average_pension": 19000.0, "average_deduction": 2300.0})
+        ins_dist_data = insured_district_data.get(nuts_code, {"insured_persons": 40000.0})
+
         recipients = int(dist_data["recipients"] * proportion)
         average_pension = int(dist_data["average_pension"])
-        
+
+        exec_recipients = int(exec_dist_data["recipients"] * proportion)
+        exec_average_pension = int(exec_dist_data["average_pension"])
+        exec_average_deduction = int(exec_dist_data["average_deduction"])
+
+        insured_persons = int(ins_dist_data["insured_persons"] * proportion)
+
         # Keep original sickness data if available
         old_orp = old_cssz.get(orp, {})
-        
+
         new_cssz[orp] = {
             "average_pension": average_pension,
             "recipients": recipients,
+            "insured_persons": insured_persons,
             "avg_sickness_duration_days": old_orp.get("avg_sickness_duration_days", 42),
             "sickness_days_total": old_orp.get("sickness_days_total", 200000),
-            "sickness_ratio_pct": old_orp.get("sickness_ratio_pct", 4.5)
+            "sickness_ratio_pct": old_orp.get("sickness_ratio_pct", 4.5),
+            "execution_recipients": exec_recipients,
+            "execution_average_pension": exec_average_pension,
+            "execution_average_deduction": exec_average_deduction
         }
 
     with open(cssz_data_path, "w", encoding="utf-8") as f:
