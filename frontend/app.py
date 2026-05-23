@@ -150,6 +150,7 @@ try:
     services = fetch_data("/api/social-services")
     geojson_data = fetch_data("/api/orp/geojson")
     cssz_data = fetch_data("/api/orp/cssz")
+    demographics_data = fetch_data("/api/orp/demographics")
 except Exception as e:
     st.error(f"Nepodařilo se načíst základní data. Zkontrolujte prosím přítomnost souborů ve složce data/. Detaily: {e}")
     st.stop()
@@ -906,7 +907,7 @@ with tab_cssz:
     st.markdown("<h4 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Údaje ČSSZ: Důchody a Nemocenské dávky</h4>", unsafe_allow_html=True)
     st.markdown("<p style='color: #c4ccdf; font-size: 0.95rem;'>Tato sekce obsahuje agregovaná (ukázková) data České správy sociálního zabezpečení (ČSSZ) pro vybrané území.</p>", unsafe_allow_html=True)
 
-    col_c1, col_c2 = st.columns(2)
+    col_c1, col_c2, col_c3 = st.columns(3)
     with col_c1:
         st.markdown("### 🧓 Starobní důchody (Odhad)")
         if selected_orp == "Celý kraj":
@@ -930,6 +931,34 @@ with tab_cssz:
             orp_cssz = cssz_data[selected_orp]
             render_metric_card(f"Průměrná doba trvání PNP v ORP {selected_orp}", f"{orp_cssz['avg_sickness_duration_days']} dní", "V souladu s krajem", "none")
             render_metric_card("Podíl práce neschopných (PNP)", f"{orp_cssz['sickness_ratio_pct']} %", "Stabilní podíl", "up")
+
+    with col_c3:
+        st.markdown("### 💼 Sociální pojištění a udržitelnost")
+        if selected_orp == "Celý kraj":
+            total_recipients = sum(v["recipients"] for v in cssz_data.values())
+            # Dynamically calculate active contributors from downloaded demographics and indicators data
+            total_active = 0
+            for orp, v in cssz_data.items():
+                orp_dem = demographics_data[orp][-1]
+                orp_unemp = indicators[orp]["unemployment_rate"]
+                # 77% economic activity rate, minus the unemployed
+                orp_active = int(orp_dem["pop_15_64"] * 0.77 * (1 - orp_unemp / 100))
+                total_active += orp_active
+            
+            ratio = round(total_active / total_recipients, 2) if total_recipients > 0 else 0.0
+            render_metric_card("Výdělečně činní (plátci pojistného)", f"{total_active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
+            render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Udržitelnost systému (poměr)", "down" if ratio < 2.0 else "none")
+        else:
+            orp_cssz = cssz_data[selected_orp]
+            recipients = orp_cssz["recipients"]
+            # Dynamically calculate active contributors from downloaded demographics and indicators data for selected ORP
+            orp_dem = demographics_data[selected_orp][-1]
+            orp_unemp = indicators[selected_orp]["unemployment_rate"]
+            active = int(orp_dem["pop_15_64"] * 0.77 * (1 - orp_unemp / 100))
+            
+            ratio = round(active / recipients, 2) if recipients > 0 else 0.0
+            render_metric_card(f"Výdělečně činní v ORP {selected_orp}", f"{active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
+            render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", f"Poměr pro ORP {selected_orp}", "down" if ratio < 2.0 else "none")
 
     st.info("💡 Toto je ukázková vizualizace sekce pro data ČSSZ integrovaná z back-endu.")
 
