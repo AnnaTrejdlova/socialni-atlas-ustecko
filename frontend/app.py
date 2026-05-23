@@ -167,7 +167,7 @@ theme_init_js = """
         const savedTheme = window.parent.localStorage.getItem('theme');
         const urlParams = new URLSearchParams(window.parent.location.search);
         const urlTheme = urlParams.get('theme');
-        
+
         if (savedTheme && savedTheme !== urlTheme) {
             urlParams.set('theme', savedTheme);
             window.parent.location.search = urlParams.toString();
@@ -206,7 +206,7 @@ except Exception as e:
 def local_css(file_name):
     with open(file_name, encoding="utf-8") as f:
         css_content = f.read()
-    
+
     # Append light mode CSS variables if theme is light
     if st.session_state.theme == "light":
         light_overrides = """
@@ -219,33 +219,33 @@ def local_css(file_name):
             --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
             --card-hover-border: rgba(66, 133, 244, 0.25);
             --card-hover-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08), 0 0 15px rgba(66, 133, 244, 0.03);
-            
+
             --white-spot-bg: rgba(220, 53, 69, 0.04);
             --white-spot-border: rgba(220, 53, 69, 0.15);
             --white-spot-hover-border: rgba(220, 53, 69, 0.35);
             --white-spot-hover-shadow: 0 12px 40px 0 rgba(220, 53, 69, 0.08);
-            
+
             --header-title-gradient: linear-gradient(135deg, #1b2a4a 30%, #475a80 100%);
             --header-subtitle-color: #4b5563;
-            
+
             --metric-value-color: #1a202c;
             --metric-label-color: #4b5563;
-            
+
             --sidebar-bg: #ffffff;
             --sidebar-border: rgba(0, 0, 0, 0.06);
             --sidebar-text-primary: #1a202c;
             --sidebar-text-muted: #6b7280;
             --sidebar-hr: rgba(0, 0, 0, 0.06);
-            
+
             --tab-bg: rgba(0, 0, 0, 0.02);
             --tab-border: rgba(0, 0, 0, 0.04);
             --tab-text: #4b5563;
             --tab-selected-bg: rgba(0, 0, 0, 0.05);
             --tab-selected-text: #111827;
-            
+
             --footer-color: #718096;
             --footer-border: rgba(0, 0, 0, 0.05);
-            
+
             --code-bg: rgba(0, 0, 0, 0.04);
         }
         """
@@ -321,23 +321,48 @@ st.sidebar.subheader("Vrstvy mapy (Sociální Atlas)")
 selected_indicator_label = st.sidebar.selectbox(
     "Zobrazovaný indikátor:",
     [
-        "Míra nezaměstnanosti (%)",
-        "Podíl obyvatel v exekuci (%)",
-        "Podíl vyloučených lokalit (%)",
-        "Kriminalita na 1000 obyv.",
-        "Příspěvky na bydlení na 1000 obyv."
+        "Počet důchodců",
+        "Průměrná výše důchodu",
+        "Exekuční srážky důchodců",
+        "Nezaměstnanost",
+        "Kriminalita"
     ]
 )
 
 INDICATOR_MAPPING = {
-    "Míra nezaměstnanosti (%)": ("unemployment_rate", "%", "unemployment_rate", cm.linear.YlOrRd_09),
-    "Podíl obyvatel v exekuci (%)": ("exekuce_rate", "%", "exekuce_rate", cm.linear.OrRd_09),
-    "Podíl vyloučených lokalit (%)": ("excluded_localities_ratio", "%", "excluded_localities_ratio", cm.linear.Reds_09),
-    "Kriminalita na 1000 obyv.": ("crime_rate_per_1k", "případů", "crime_rate_per_1k", cm.linear.Purples_09),
-    "Příspěvky na bydlení na 1000 obyv.": ("housing_benefits_per_1k", "příjemců", "housing_benefits_per_1k", cm.linear.PuRd_09)
+    "Počet důchodců": ("cssz", "recipients", "osob", "recipients", cm.linear.Blues_09),
+    "Průměrná výše důchodu": ("cssz", "average_pension", "Kč", "average_pension", cm.linear.Greens_09),
+    "Exekuční srážky důchodců": ("indicators", "exekuce_rate", "%", "exekuce_rate", cm.linear.OrRd_09),
+    "Nezaměstnanost": ("indicators", "unemployment_rate", "%", "unemployment_rate", cm.linear.YlOrRd_09),
+    "Kriminalita": ("indicators", "crime_rate_per_1k", "případů", "crime_rate_per_1k", cm.linear.Purples_09)
 }
 
-indicator_key, indicator_unit, indicator_title, colormap_fn = INDICATOR_MAPPING[selected_indicator_label]
+selected_indicator_source, indicator_key, indicator_unit, indicator_title, colormap_fn = INDICATOR_MAPPING[selected_indicator_label]
+
+def get_indicator_value(orp_name):
+    if selected_indicator_source == "indicators":
+        return indicators.get(orp_name, {}).get(indicator_key, 0.0)
+    return cssz_data.get(orp_name, {}).get(indicator_key, 0.0)
+
+
+def format_indicator_value(value):
+    if value is None:
+        return "0"
+    if isinstance(value, float) and not value.is_integer():
+        return f"{value:.1f}"
+    if indicator_key in ("recipients", "average_pension"):
+        try:
+            return f"{int(value):,}".replace(",", " ")
+        except Exception:
+            return str(value)
+    if isinstance(value, (int, np.integer)):
+        return str(int(value))
+    return str(value)
+
+
+def format_value_with_unit(value):
+    formatted = format_indicator_value(value)
+    return f"{formatted} {indicator_unit}".strip()
 
 st.sidebar.subheader("Zobrazit body zájmu (POI):")
 show_stationary = st.sidebar.checkbox("Pobytová zařízení (red)", value=True)
@@ -364,7 +389,7 @@ with col_theme_sw:
     if new_theme != st.session_state.theme:
         st.session_state.theme = new_theme
         st.query_params["theme"] = new_theme
-        
+
         # Write back to localStorage using a tiny helper component
         components.html(f"""
         <script>
@@ -404,11 +429,9 @@ def render_metric_card(label, value, trend_text="", trend_direction="none", extr
     """, unsafe_allow_html=True)
 
 # Create App Tabs (Excluding LLM/AI Assistant completely)
-tab_atlas, tab_predictions, tab_exports, tab_cssz = st.tabs([
+tab_atlas, tab_predictions = st.tabs([
     "📂 SOCIÁLNÍ ATLAS (Současnost)",
-    "📈 PREDIKTIVNÍ MODEL (2026–2035)",
-    "📊 ANALÝZA A EXPORT DAT",
-    "🏥 DATA ČSSZ (Dávky a důchody)"
+    "📈 PREDIKTIVNÍ MODEL (2026–2035)"
 ])
 
 # ----------------- TAB 1: SOCIÁLNÍ ATLAS -----------------
@@ -419,39 +442,68 @@ with tab_atlas:
 
     if selected_orp == "Celý kraj":
         total_pop_2025 = sum(dem[2025-2018]["total_pop"] for dem in fetch_data("/api/orp/demographics").values())
-        avg_indicator = round(np.mean([ind[indicator_key] for ind in indicators.values()]), 1)
-        max_orp, max_record = max(indicators.items(), key=lambda item: item[1][indicator_key])
-        min_orp, min_record = min(indicators.items(), key=lambda item: item[1][indicator_key])
-        max_value = max_record[indicator_key]
-        min_value = min_record[indicator_key]
+        values = [get_indicator_value(orp_name) for orp_name in indicators.keys()]
+        avg_indicator = round(np.mean(values), 1)
+        max_orp = max(indicators.keys(), key=lambda orp_name: get_indicator_value(orp_name))
+        min_orp = min(indicators.keys(), key=lambda orp_name: get_indicator_value(orp_name))
+        max_value = get_indicator_value(max_orp)
+        min_value = get_indicator_value(min_orp)
         range_indicator = round(max_value - min_value, 1)
 
-        with col1:
-            render_metric_card(f"Průměr {selected_indicator_label}", f"{avg_indicator} {indicator_unit}", "Současný krajský průměr", "none")
-        with col2:
-            render_metric_card("Nejvyšší ORP", f"{max_orp}: {max_value} {indicator_unit}", "Nejvyšší hodnota v kraji", "up")
-        with col3:
-            render_metric_card("Nejnižší ORP", f"{min_orp}: {min_value} {indicator_unit}", "Nejnižší hodnota v kraji", "down")
-        with col4:
-            render_metric_card(f"Rozpětí {selected_indicator_label}", f"{range_indicator} {indicator_unit}", f"Rozdíl mezi {max_orp} a {min_orp}", "none")
+        if selected_indicator_source == "cssz" and indicator_key == "recipients":
+            total_recipients = sum(cssz_data.get(orp_name, {}).get("recipients", 0) for orp_name in cssz_data.keys())
+            total_active = 0
+            for orp_name in cssz_data.keys():
+                orp_dem = demographics_data.get(orp_name, [])
+                orp_last = orp_dem[-1] if orp_dem else {}
+                orp_unemp = indicators.get(orp_name, {}).get("unemployment_rate", 0.0)
+                orp_active = int(orp_last.get("pop_15_64", 0) * 0.77 * (1 - orp_unemp / 100))
+                total_active += orp_active
+            ratio = round(total_active / total_recipients, 2) if total_recipients > 0 else 0.0
+
+            with col1:
+                render_metric_card("Důchodci celkem", f"{total_recipients:,}".replace(",", " ") + f" {indicator_unit}", "Celkový počet příjemců důchodů v kraji", "none")
+            with col2:
+                render_metric_card("Nejvyšší ORP", f"{max_orp}: {format_value_with_unit(max_value)}", "Nejvyšší počet důchodců", "up")
+            with col3:
+                render_metric_card("Nejnižší ORP", f"{min_orp}: {format_value_with_unit(min_value)}", "Nejnižší počet důchodců", "down")
+            with col4:
+                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vypočteno z dat ČSÚ (15-64 let)", "none")
+        else:
+            with col1:
+                render_metric_card(f"Průměr {selected_indicator_label}", format_value_with_unit(avg_indicator), "Současný krajský průměr", "none")
+            with col2:
+                render_metric_card("Nejvyšší ORP", f"{max_orp}: {format_value_with_unit(max_value)}", "Nejvyšší hodnota v kraji", "up")
+            with col3:
+                render_metric_card("Nejnižší ORP", f"{min_orp}: {format_value_with_unit(min_value)}", "Nejnižší hodnota v kraji", "down")
+            with col4:
+                render_metric_card(f"Rozpětí {selected_indicator_label}", format_value_with_unit(range_indicator), f"Rozdíl mezi {max_orp} a {min_orp}", "none")
     else:
         hist_dem = fetch_data("/api/orp/demographics")[selected_orp]
         pop_2025 = hist_dem[-1]["total_pop"]
-        indicator_value = indicators[selected_orp][indicator_key]
-        avg_indicator = round(np.mean([ind[indicator_key] for orp, ind in indicators.items() if orp != selected_orp]), 1)
+        orp_last = hist_dem[-1] if hist_dem else {}
+        orp_unemp = indicators.get(selected_orp, {}).get("unemployment_rate", 0.0)
+        indicator_value = get_indicator_value(selected_orp)
+        avg_indicator = round(np.mean([get_indicator_value(orp_name) for orp_name in indicators.keys()]), 1)
         diff_value = round(indicator_value - avg_indicator, 1)
         diff_direction = "up" if diff_value > 0 else "down" if diff_value < 0 else "none"
-        diff_text = f"{abs(diff_value)} {indicator_unit} {'nad' if diff_value > 0 else 'pod' if diff_value < 0 else 've shodě s'} průměrem"
+        diff_text = f"{format_value_with_unit(abs(diff_value))} {'nad' if diff_value > 0 else 'pod' if diff_value < 0 else 've shodě s'} průměrem kraje"
         orp_capacity = sum(s["capacity"] for s in services if s["orp"] == selected_orp)
 
         with col1:
-            render_metric_card(selected_indicator_label, f"{indicator_value} {indicator_unit}", f"ORP {selected_orp}", diff_direction)
+            render_metric_card(selected_indicator_label, format_value_with_unit(indicator_value), f"ORP {selected_orp}", diff_direction)
         with col2:
-            render_metric_card(f"Krajský průměr {selected_indicator_label}", f"{avg_indicator} {indicator_unit}", "Průměr ostatních ORP", "none")
+            render_metric_card(f"Krajský průměr {selected_indicator_label}", format_value_with_unit(avg_indicator), "Průměr celého kraje", "none")
         with col3:
-            render_metric_card("Rozdíl proti průměru", f"{abs(diff_value)} {indicator_unit}", diff_text, diff_direction)
+            render_metric_card("Rozdíl proti průměru kraje", format_value_with_unit(abs(diff_value)), diff_text, diff_direction)
         with col4:
-            render_metric_card("Populace 2025", f"{pop_2025:,}".replace(",", " "), "Dle dat ČSÚ", "none")
+            if selected_indicator_source == "cssz" and indicator_key == "recipients":
+                recipients = cssz_data.get(selected_orp, {}).get("recipients", 0)
+                orp_active = int(orp_last.get("pop_15_64", 0) * 0.77 * (1 - orp_unemp / 100))
+                ratio = round(orp_active / recipients, 2) if recipients > 0 else 0.0
+                render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Vypočteno z dat ČSÚ (15-64 let)", "down" if ratio < 2.0 else "none")
+            else:
+                render_metric_card("Populace 2025", f"{pop_2025:,}".replace(",", " "), "Dle dat ČSÚ", "none")
 
     st.markdown("<br/>", unsafe_allow_html=True)
 
@@ -471,7 +523,7 @@ with tab_atlas:
                     break
 
         map_geo = copy.deepcopy(geojson_data)
-        values = [ind[indicator_key] for ind in indicators.values()]
+        values = [get_indicator_value(orp_name) for orp_name in indicators.keys()]
         min_val, max_val = min(values), max(values)
 
         colormap = colormap_fn.scale(min_val, max_val)
@@ -496,7 +548,7 @@ with tab_atlas:
 
         for feature in map_geo.get("features", []):
             name = feature["properties"]["name"]
-            val = indicators.get(name, {}).get(indicator_key, 0.0)
+            val = get_indicator_value(name)
             feature["properties"]["indicator_val"] = val
             feature["properties"]["indicator_label"] = selected_indicator_label
 
@@ -600,10 +652,10 @@ with tab_atlas:
         st.markdown("<div style='font-size: 0.9rem; color: var(--metric-label-color); margin-bottom: 10px; font-weight: 600;'>POROVNÁNÍ NAPŘÍČ OBLASTMI</div>", unsafe_allow_html=True)
 
         comp_list = []
-        for orp_name, ind in indicators.items():
+        for orp_name in indicators.keys():
             comp_list.append({
                 "ORP": orp_name,
-                "Hodnota": ind[indicator_key],
+                "Hodnota": get_indicator_value(orp_name),
                 "Skupina": "Vybraná oblast" if orp_name == selected_orp else "Ostatní ORP"
             })
         df_comp = pd.DataFrame(comp_list).sort_values(by="Hodnota", ascending=True)
@@ -863,259 +915,6 @@ with tab_predictions:
         df_table = df_ws.copy()
         df_table.columns = ["ORP", "Index Bílého místa (WSI)", "Nezaměstnanost (%)", "Exekuce (%)", "Celková kapacita (lůžka/klienti)", "Růst seniorů 75+ (%)"]
         st.dataframe(df_table, width='stretch', hide_index=True)
-
-# ----------------- TAB 3: REPORTY A EXPORT -----------------
-with tab_exports:
-    st.markdown("<h4 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Exekutivní shrnutí a exporty datových sad</h4>", unsafe_allow_html=True)
-
-    # 1. Executive Summary Generator block
-    st.markdown("### 📝 Exekutivní analýza pro vybrané území")
-
-    if selected_orp == "Celý kraj":
-        stressed_orps = [p["orp"] for p in predictions_val.values() if p["stress_alert"]]
-        st.markdown(f"""
-        <div class="metric-card" style="border-left: 5px solid #ff4b4b !important;">
-            <div style="font-size: 1.3rem; font-weight: 800; color: var(--text-color); margin-bottom: 10px;">KRITICKÁ ANALÝZA ÚSTECKÉHO KRAJE (Horizont do roku 2035)</div>
-            <p style="color: var(--text-color); line-height: 1.6; font-size: 0.95rem;">
-                Ústecký kraj čelí kombinovanému tlaku: vysokému socioekonomickému znevýhodnění a výrazně zrychlenému stárnutí populace.
-                Do roku 2035 dojde v celém kraji k nárůstu populace starší 75 let o průměrně 35-40 %.
-            </p>
-            <div style="margin: 15px 0px; padding: 12px; background: var(--white-spot-bg); border: 1px solid var(--white-spot-border); border-radius: 8px;">
-                <strong>🚨 Hlavní kapacitní rizika (Kritický deficit kapacit nad {deficit_threshold}%):</strong><br/>
-                Kritické ohrožení je v roce {pred_year} detekováno v {len(stressed_orps)} z 16 ORP: <strong>{", ".join(stressed_orps)}</strong>.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        orp_p = predictions_val[selected_orp]
-        def_pct = orp_p["deficit_percent"]
-
-        try:
-            if "hist_2025_pop_75plus" in orp_p:
-                pop_75_2025_rep = orp_p["hist_2025_pop_75plus"]
-            else:
-                hist_dem_rep = fetch_data("/api/orp/demographics")[selected_orp]
-                pop_75_2025_rep = hist_dem_rep[-1]["pop_75plus"]
-            growth_pct = round(((orp_p["pop_75plus"] - pop_75_2025_rep) / pop_75_2025_rep) * 100.0, 1)
-        except Exception:
-            growth_pct = 0.0
-            pop_75_2025_rep = 0
-
-        if orp_p["stress_alert"]:
-            risk_title = "🚨 KRITICKÉ KAPACITNÍ RIZIKO (VYSOKÉ)"
-            risk_border = "border-left: 5px solid #dc3545 !important;"
-            risk_desc = f"V oblasti {selected_orp} je predikován vážný nedostatek lůžek. Rychlý růst nejstarší věkové skupiny ({growth_pct}%) překonává stávající kapacitu."
-        elif def_pct > 0:
-            risk_title = "⚠️ STŘEDNÍ KAPACITNÍ RIZIKO"
-            risk_border = "border-left: 5px solid #ff9f1c !important;"
-            risk_desc = f"Kapacita stacionárních služeb v ORP {selected_orp} je prozatím stabilní, avšak do roku {pred_year} se očekává deficit {def_pct}%."
-        else:
-            risk_title = "✅ NÍZKÉ KAPACITNÍ RIZIKO"
-            risk_border = "border-left: 5px solid #2ec4b6 !important;"
-            risk_desc = f"ORP {selected_orp} vykazuje dostatečnou lůžkovou kapacitu pro pokrytí očekávaného nárůstu seniorů v horizontu do roku {pred_year}."
-
-        st.markdown(f"""
-        <div class="metric-card" style="{risk_border}">
-            <div style="font-size: 1.3rem; font-weight: 800; color: var(--text-color); margin-bottom: 5px;">HODNOCENÍ ÚZEMÍ: ORP {selected_orp}</div>
-            <div style="font-size: 0.9rem; font-weight: 600; color: #ffbe0b; margin-bottom: 15px;">{risk_title}</div>
-            <p style="color: var(--text-color); font-size: 0.95rem;">
-                Míra nezaměstsnanosti: <strong>{orp_p['unemployment_rate']} %</strong> | Obyvatel v exekuci: <strong>{orp_p['exekuce_rate']} %</strong><br/>
-                Populace seniorů nad 75 let vzroste do roku {pred_year} o <strong>{growth_pct} %</strong>.<br/>
-                Očekávaná teoretická poptávka: <strong>{orp_p['predicted_demand']} lůžek</strong> vs. stávající kapacita <strong>{orp_p['current_capacity']} lůžek</strong>.
-            </p>
-            <div style="margin-top: 15px; padding: 12px; background: var(--tab-bg); border-radius: 8px; color: var(--text-color);">
-                <strong>Doporučení:</strong> {risk_desc}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("<br/>### 📥 Stáhnout datové podklady v otevřených formátech", unsafe_allow_html=True)
-    col_d1, col_d2, col_d3 = st.columns(3)
-
-    with col_d1:
-        export_orp = selected_orp if selected_orp != "Celý kraj" else "Ústí nad Labem"
-        hist_exp = fetch_data("/api/orp/demographics")[export_orp]
-        from backend.forecasting import get_forecast_for_orp
-        future_exp = []
-        for y in range(2026, 2036):
-            f = get_forecast_for_orp(export_orp, y)
-            if f:
-                future_exp.append({"year": y, "total_pop": f["total_pop"], "pop_65plus": f["pop_65plus"], "pop_75plus": f["pop_75plus"], "net_migration": f["net_migration"]})
-        df_exp_dem = pd.concat([pd.DataFrame(hist_exp), pd.DataFrame(future_exp)], ignore_index=True)
-        csv_dem = df_exp_dem.to_csv(index=False).encode('utf-8')
-
-        st.download_button(
-            label="📥 Stáhnout demografii (CSV)",
-            data=csv_dem,
-            file_name=f"demografie_projekce_{export_orp}.csv",
-            mime="text/csv",
-            key="btn_download_dem"
-        )
-
-    # Export 2: Social Services registry
-    with col_d2:
-        st.markdown("""
-        <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
-            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 10px;">Registr sociálních služeb</div>
-            <p style="font-size: 0.8rem; color: var(--metric-label-color); min-height: 50px;">Seznam aktuálních poskytovatelů péče s kapacitami a GPS v aktivním území.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Filter services
-        if selected_orp != "Celý kraj":
-            filtered_serv = [s for s in services if s["orp"] == selected_orp]
-        else:
-            filtered_serv = services
-        df_serv = pd.DataFrame(filtered_serv)
-        csv_serv = df_serv.to_csv(index=False).encode('utf-8')
-
-        st.download_button(
-            label="📥 Stáhnout registr služeb (CSV)",
-            data=csv_serv,
-            file_name=f"socialni_sluzby_{selected_orp}.csv",
-            mime="text/csv",
-            key="btn_download_services"
-        )
-
-    # Export 3: Calculations summary (JSON)
-    with col_d3:
-        st.markdown("""
-        <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
-            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 10px;">Kompletní predikční data</div>
-            <p style="font-size: 0.8rem; color: var(--metric-label-color); min-height: 50px;">Kompletní modelové výstupy deficitů pro všechny ORP v roce {pred_year} (JSON format).</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        json_pred = json.dumps(predictions_val, ensure_ascii=False, indent=2)
-
-        st.download_button(
-            label="📥 Stáhnout analýzu deficitů (JSON)",
-            data=json_pred,
-            file_name=f"predikce_kapacit_{pred_year}.json",
-            mime="application/json",
-            key="btn_download_json"
-        )
-
-
-# ----------------- TAB 4: DATA ČSSZ -----------------
-with tab_cssz:
-    st.markdown("<h4 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Údaje ČSSZ: Důchody a Nemocenské dávky</h4>", unsafe_allow_html=True)
-    st.markdown("<p style='color: var(--text-color); font-size: 0.95rem;'>Tato sekce obsahuje agregovaná (ukázková) data České správy sociálního zabezpečení (ČSSZ) pro vybrané území.</p>", unsafe_allow_html=True)
-
-    col_c1, col_c2, col_c3 = st.columns(3)
-    with col_c1:
-        st.markdown("### 🧓 Starobní důchody")
-        if selected_orp == "Celý kraj":
-            total_recipients = sum(v["recipients"] for v in cssz_data.values())
-            avg_pension = int(sum(v["average_pension"] * v["recipients"] for v in cssz_data.values()) / total_recipients)
-            total_volume = sum(v["average_pension"] * v["recipients"] for v in cssz_data.values())
-            volume_mld = total_volume / 1_000_000_000.0
-            
-            render_metric_card("Průměrná výše důchodu", f"{avg_pension:,}".replace(",", " ") + " Kč", "ČSSZ 2024", "none")
-            render_metric_card("Počet příjemců starobního důchodu", f"{total_recipients:,}".replace(",", " "), "ČSSZ 2024", "none")
-            render_metric_card("Celkový měsíční objem důchodů", f"{total_volume:,}".replace(",", " ") + " Kč", f"~ {volume_mld:.2f} mld. Kč", "none")
-        else:
-            orp_cssz = cssz_data[selected_orp]
-            monthly_volume = orp_cssz["recipients"] * orp_cssz["average_pension"]
-            volume_mil = monthly_volume / 1_000_000.0
-            
-            render_metric_card(f"Průměrný důchod v ORP {selected_orp}", f"{orp_cssz['average_pension']:,}".replace(",", " ") + " Kč", "ČSSZ 2024", "none")
-            render_metric_card("Počet příjemců", f"{orp_cssz['recipients']:,}".replace(",", " "), "ČSSZ 2024", "none")
-            render_metric_card("Měsíční objem důchodů v ORP", f"{monthly_volume:,}".replace(",", " ") + " Kč", f"~ {volume_mil:.2f} mil. Kč", "none")
-
-    with col_c2:
-        st.markdown("### 🤒 Nemocenské a další dávky")
-        if selected_orp == "Celý kraj":
-            avg_duration = sum(v["avg_sickness_duration_days"] for v in cssz_data.values()) // len(cssz_data)
-            total_days = sum(v["sickness_days_total"] for v in cssz_data.values())
-            render_metric_card("Průměrná doba trvání PNP", f"{avg_duration} dní", "Dle dat ČSSZ", "down")
-            render_metric_card("Celkový počet proplacených dnů", f"{total_days:,}".replace(",", " "), "Za celý kraj", "none")
-        else:
-            orp_cssz = cssz_data[selected_orp]
-            render_metric_card(f"Průměrná doba trvání PNP v ORP {selected_orp}", f"{orp_cssz['avg_sickness_duration_days']} dní", "V souladu s krajem", "none")
-            render_metric_card("Podíl práce neschopných (PNP)", f"{orp_cssz['sickness_ratio_pct']} %", "Stabilní podíl", "up")
-
-    with col_c3:
-        st.markdown("### 💼 Sociální pojištění a udržitelnost")
-        if selected_orp == "Celý kraj":
-            total_recipients = sum(v["recipients"] for v in cssz_data.values())
-            # Dynamically calculate active contributors from downloaded demographics and indicators data
-            total_active = 0
-            for orp, v in cssz_data.items():
-                orp_dem = demographics_data[orp][-1]
-                orp_unemp = indicators[orp]["unemployment_rate"]
-                # 77% economic activity rate, minus the unemployed
-                orp_active = int(orp_dem["pop_15_64"] * 0.77 * (1 - orp_unemp / 100))
-                total_active += orp_active
-
-            ratio = round(total_active / total_recipients, 2) if total_recipients > 0 else 0.0
-            render_metric_card("Výdělečně činní (plátci pojistného)", f"{total_active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
-            render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Udržitelnost systému (poměr)", "down" if ratio < 2.0 else "none")
-        else:
-            orp_cssz = cssz_data[selected_orp]
-            recipients = orp_cssz["recipients"]
-            # Dynamically calculate active contributors from downloaded demographics and indicators data for selected ORP
-            orp_dem = demographics_data[selected_orp][-1]
-            orp_unemp = indicators[selected_orp]["unemployment_rate"]
-            active = int(orp_dem["pop_15_64"] * 0.77 * (1 - orp_unemp / 100))
-
-            ratio = round(active / recipients, 2) if recipients > 0 else 0.0
-            render_metric_card(f"Výdělečně činní v ORP {selected_orp}", f"{active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
-            render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", f"Poměr pro ORP {selected_orp}", "down" if ratio < 2.0 else "none")
-
-    if cssz_quantiles:
-        quantiles = cssz_quantiles.get("quantiles", {})
-        ref_period = cssz_quantiles.get("reference_period", "2024-12-31")
-        
-        st.markdown("<hr style='border-color: var(--sidebar-hr); margin: 25px 0px;'/>", unsafe_allow_html=True)
-        st.markdown(f"### 📊 Celostátní rozdělení výše starobních důchodů (ČSSZ k {ref_period})", unsafe_allow_html=True)
-        
-        col_q1, col_q2, col_q3 = st.columns(3)
-        with col_q1:
-            render_metric_card("10% nejnižších důchodů (pod)", f"{int(quantiles.get('Q10', 0)):,}".replace(",", " ") + " Kč", "10. kvantil v ČR", "none")
-        with col_q2:
-            render_metric_card("Mediánový důchod (50% seniorů)", f"{int(quantiles.get('Q50', 0)):,}".replace(",", " ") + " Kč", "50. kvantil (střední hodnota)", "none")
-        with col_q3:
-            render_metric_card("10% nejvyšších důchodů (nad)", f"{int(quantiles.get('Q90', 0)):,}".replace(",", " ") + " Kč", "90. kvantil v ČR", "none")
-            
-        df_q = pd.DataFrame([
-            {"Kvantil": "10% nejnižších (Q10)", "Výše důchodu": quantiles.get("Q10", 0)},
-            {"Kvantil": "Medián (Q50)", "Výše důchodu": quantiles.get("Q50", 0)},
-            {"Kvantil": "10% nejvyšších (Q90)", "Výše důchodu": quantiles.get("Q90", 0)}
-        ])
-        
-        fig_q = px.bar(
-            df_q,
-            x="Výše důchodu",
-            y="Kvantil",
-            orientation="h",
-            text="Výše důchodu",
-            color="Kvantil",
-            color_discrete_map={
-                "10% nejnižších (Q10)": "#ff9f1c",
-                "Medián (Q50)": "#4285f4",
-                "10% nejvyšších (Q90)": "#2ec4b6"
-            },
-            height=220
-        )
-        fig_q.update_traces(
-            textposition='auto', 
-            texttemplate='%{text:,.0f} Kč',
-            hovertemplate='<b>%{y}</b><br>Výše: %{x:,.0f} Kč<extra></extra>'
-        )
-        fig_q.update_layout(
-            template=plotly_template,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color=font_color),
-            showlegend=False,
-            margin=dict(l=10, r=10, t=10, b=10),
-            xaxis=dict(gridcolor=grid_color, title="Měsíční výše důchodu (Kč)"),
-            yaxis=dict(title="")
-        )
-        st.plotly_chart(fig_q, use_container_width=True)
-
-    st.info("💡 Údaje o důchodech jsou staženy a integrovány přímo z otevřených dat České správy sociálního zabezpečení (ČSSZ).")
 
 # Custom page footer matching style.css definitions
 st.markdown("""
