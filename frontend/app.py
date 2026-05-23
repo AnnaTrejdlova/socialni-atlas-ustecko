@@ -152,15 +152,112 @@ def get_feature_bounds(geometry):
         return [[min(all_lats), min(all_lons)], [max(all_lats), max(all_lons)]]
     return None
 
-# Helper to load and inject custom stylesheet
+import streamlit.components.v1 as components
+
+# Sync theme with localStorage via URL query parameters
+# Render a tiny invisible iframe to read/write theme from/to parent's localStorage
+theme_init_js = """
+<script>
+    try {
+        const savedTheme = window.parent.localStorage.getItem('theme');
+        const urlParams = new URLSearchParams(window.parent.location.search);
+        const urlTheme = urlParams.get('theme');
+        
+        if (savedTheme && savedTheme !== urlTheme) {
+            urlParams.set('theme', savedTheme);
+            window.parent.location.search = urlParams.toString();
+        } else if (!savedTheme && urlTheme) {
+            window.parent.localStorage.setItem('theme', urlTheme);
+        }
+    } catch (e) {
+        console.error("Failed to sync localStorage theme:", e);
+    }
+</script>
+"""
+components.html(theme_init_js, height=0, width=0)
+
+# Retrieve theme from query parameters (fallback to dark)
+url_theme = st.query_params.get("theme", "dark")
+if "theme" not in st.session_state:
+    st.session_state.theme = url_theme
+
+# Dynamic Theme Configuration via Streamlit's Internal Config API
+try:
+    if st.session_state.theme == "light":
+        st._config.set_option("theme.base", "light")
+        st._config.set_option("theme.backgroundColor", "#f5f7fa")
+        st._config.set_option("theme.secondaryBackgroundColor", "#ffffff")
+        st._config.set_option("theme.textColor", "#1a202c")
+    else:
+        st._config.set_option("theme.base", "dark")
+        st._config.set_option("theme.backgroundColor", "#0d0f14")
+        st._config.set_option("theme.secondaryBackgroundColor", "#121621")
+        st._config.set_option("theme.textColor", "#ffffff")
+    st._config.set_option("theme.primaryColor", "#ff4b4b")
+except Exception as e:
+    pass
+
+# Helper to load and inject custom stylesheet with dynamic theme overrides
 def local_css(file_name):
     with open(file_name, encoding="utf-8") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+        css_content = f.read()
+    
+    # Append light mode CSS variables if theme is light
+    if st.session_state.theme == "light":
+        light_overrides = """
+        :root {
+            --app-bg: #f5f7fa;
+            --app-bg-gradient: radial-gradient(at 10% 20%, rgba(66, 133, 244, 0.06) 0px, transparent 50%),
+                               radial-gradient(at 90% 80%, rgba(220, 53, 69, 0.04) 0px, transparent 50%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+            --card-hover-border: rgba(66, 133, 244, 0.25);
+            --card-hover-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08), 0 0 15px rgba(66, 133, 244, 0.03);
+            
+            --white-spot-bg: rgba(220, 53, 69, 0.04);
+            --white-spot-border: rgba(220, 53, 69, 0.15);
+            --white-spot-hover-border: rgba(220, 53, 69, 0.35);
+            --white-spot-hover-shadow: 0 12px 40px 0 rgba(220, 53, 69, 0.08);
+            
+            --header-title-gradient: linear-gradient(135deg, #1b2a4a 30%, #475a80 100%);
+            --header-subtitle-color: #4b5563;
+            
+            --metric-value-color: #1a202c;
+            --metric-label-color: #4b5563;
+            
+            --sidebar-bg: #ffffff;
+            --sidebar-border: rgba(0, 0, 0, 0.06);
+            --sidebar-text-primary: #1a202c;
+            --sidebar-text-muted: #6b7280;
+            --sidebar-hr: rgba(0, 0, 0, 0.06);
+            
+            --tab-bg: rgba(0, 0, 0, 0.02);
+            --tab-border: rgba(0, 0, 0, 0.04);
+            --tab-text: #4b5563;
+            --tab-selected-bg: rgba(0, 0, 0, 0.05);
+            --tab-selected-text: #111827;
+            
+            --footer-color: #718096;
+            --footer-border: rgba(0, 0, 0, 0.05);
+            
+            --code-bg: rgba(0, 0, 0, 0.04);
+        }
+        """
+        css_content += "\n" + light_overrides
+    st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
 # Load styling
 css_path = os.path.join(os.path.dirname(__file__), "style.css")
 if os.path.exists(css_path):
     local_css(css_path)
+
+# Set dynamic themes for components
+plotly_template = "plotly_white" if st.session_state.theme == "light" else "plotly_dark"
+map_tiles = "cartodbpositron" if st.session_state.theme == "light" else "cartodbdarkmatter"
+grid_color = "rgba(0,0,0,0.08)" if st.session_state.theme == "light" else "rgba(255,255,255,0.05)"
+font_color = "#1a202c" if st.session_state.theme == "light" else "#ffffff"
+legend_text_color = "#1a202c" if st.session_state.theme == "light" else "#ffffff"
 
 # Fetch global datasets
 try:
@@ -186,10 +283,35 @@ if "menu_version" not in st.session_state:
 orp_options = ["Celý kraj"] + sorted(list(indicators.keys()))
 
 # ----------------- SIDEBAR PANEL -----------------
+# Theme toggle button in sidebar header
+col_theme_lbl, col_theme_sw = st.sidebar.columns([3, 1])
+with col_theme_lbl:
+    st.markdown("<div style='padding-top: 5px; font-size: 0.8rem; font-weight: 800; color: var(--sidebar-text-muted); text-transform: uppercase;'>REŽIM VZHLEDU</div>", unsafe_allow_html=True)
+with col_theme_sw:
+    is_light = st.toggle("☀️", value=(st.session_state.theme == "light"), key="theme_toggle", label_visibility="collapsed")
+    new_theme = "light" if is_light else "dark"
+    if new_theme != st.session_state.theme:
+        st.session_state.theme = new_theme
+        st.query_params["theme"] = new_theme
+        
+        # Write back to localStorage using a tiny helper component
+        components.html(f"""
+        <script>
+            try {{
+                window.parent.localStorage.setItem('theme', '{new_theme}');
+            }} catch (e) {{
+                console.error(e);
+            }}
+        </script>
+        """, height=0, width=0)
+        st.rerun()
+
+st.sidebar.markdown("<hr style='border-color: var(--sidebar-hr); margin: 5px 0px 15px 0px;'/>", unsafe_allow_html=True)
+
 st.sidebar.markdown("""
 <div style="text-align: center; padding-bottom: 10px;">
-    <h2 style="color: #ffffff; font-weight: 800; margin-bottom: 0px;">NASTAVENÍ</h2>
-    <span style="color: #525a7a; font-size: 0.85rem;">PREDIKTIVNÍ ATLAS</span>
+    <h2 style="color: var(--sidebar-text-primary); font-weight: 800; margin-bottom: 0px; font-size: 1.5rem;">NASTAVENÍ</h2>
+    <span style="color: var(--sidebar-text-muted); font-size: 0.85rem;">PREDIKTIVNÍ ATLAS</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -212,7 +334,7 @@ selected_orp = st.sidebar.selectbox(
 
 selected_orp = st.session_state.selected_orp
 
-st.sidebar.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 15px 0px;'/>", unsafe_allow_html=True)
+st.sidebar.markdown("<hr style='border-color: var(--sidebar-hr); margin: 15px 0px;'/>", unsafe_allow_html=True)
 
 st.sidebar.subheader("Vrstvy mapy (Sociální Atlas)")
 selected_indicator_label = st.sidebar.selectbox(
@@ -241,11 +363,11 @@ show_stationary = st.sidebar.checkbox("Pobytová zařízení (red)", value=True)
 show_field = st.sidebar.checkbox("Terénní služby (green)", value=True)
 show_shelters = st.sidebar.checkbox("Azylové domy (blue)", value=False)
 
-st.sidebar.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 15px 0px;'/>", unsafe_allow_html=True)
+st.sidebar.markdown("<hr style='border-color: var(--sidebar-hr); margin: 15px 0px;'/>", unsafe_allow_html=True)
 st.sidebar.markdown("""
 <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
-    <div style="font-size: 0.75rem; color: #8c96bc; font-weight: 600; text-transform: uppercase;">Aktivní území</div>
-    <div style="font-size: 1.15rem; color: #ffffff; font-weight: 800; margin-top: 5px;">""" + selected_orp + """</div>
+    <div style="font-size: 0.75rem; color: var(--metric-label-color); font-weight: 600; text-transform: uppercase;">Aktivní území</div>
+    <div style="font-size: 1.15rem; color: var(--metric-value-color); font-weight: 800; margin-top: 5px;">""" + selected_orp + """</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -286,7 +408,7 @@ tab_atlas, tab_predictions, tab_exports, tab_cssz = st.tabs([
 
 # ----------------- TAB 1: SOCIÁLNÍ ATLAS -----------------
 with tab_atlas:
-    st.markdown("<h4 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Současná sociální a demografická situace</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Současná sociální a demografická situace</h4>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -331,9 +453,9 @@ with tab_atlas:
     col_map, col_chart = st.columns([5, 4])
 
     with col_map:
-        st.markdown(f"<div style='font-size: 0.9rem; color: #8c96bc; margin-bottom: 10px; font-weight: 600;'>KARTOGRAFICKÉ ZOBRAZENÍ: {selected_indicator_label}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 0.9rem; color: var(--metric-label-color); margin-bottom: 10px; font-weight: 600;'>KARTOGRAFICKÉ ZOBRAZENÍ: {selected_indicator_label}</div>", unsafe_allow_html=True)
 
-        m = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles="cartodbpositron")
+        m = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles=map_tiles)
 
         if selected_orp != "Celý kraj":
             for feature in geojson_data.get("features", []):
@@ -350,6 +472,22 @@ with tab_atlas:
         colormap = colormap_fn.scale(min_val, max_val)
         colormap.caption = f"{selected_indicator_label}"
         colormap.add_to(m)
+
+        # Style the map legend text and lines dynamically inside the iframe based on theme
+        legend_css = f"""
+        <style>
+            .legend text {{
+                fill: {legend_text_color} !important;
+                font-family: 'Outfit', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 600 !important;
+            }}
+            .legend line {{
+                stroke: {legend_text_color} !important;
+            }}
+        </style>
+        """
+        m.get_root().header.add_child(folium.Element(legend_css))
 
         for feature in map_geo.get("features", []):
             name = feature["properties"]["name"]
@@ -454,7 +592,7 @@ with tab_atlas:
                 st.rerun()
 
     with col_chart:
-        st.markdown("<div style='font-size: 0.9rem; color: #8c96bc; margin-bottom: 10px; font-weight: 600;'>POROVNÁNÍ NAPŘÍČ OBLASTMI</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size: 0.9rem; color: var(--metric-label-color); margin-bottom: 10px; font-weight: 600;'>POROVNÁNÍ NAPŘÍČ OBLASTMI</div>", unsafe_allow_html=True)
 
         comp_list = []
         for orp_name, ind in indicators.items():
@@ -471,18 +609,19 @@ with tab_atlas:
             y="ORP",
             orientation="h",
             color="Skupina",
-            color_discrete_map={"Vybraná oblast": "#ff4b4b", "Ostatní ORP": "#282c3c"},
+            color_discrete_map={"Vybraná oblast": "#ff4b4b", "Ostatní ORP": "#e4e6eb" if st.session_state.theme == "light" else "#282c3c"},
             labels={"Hodnota": f"{selected_indicator_label} [{indicator_unit}]", "ORP": ""},
             height=430
         )
         fig_comp.update_layout(
-            template="plotly_dark",
+            template=plotly_template,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color=font_color),
             showlegend=False,
             margin=dict(l=10, r=10, t=10, b=10),
-            xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-            yaxis=dict(gridcolor="rgba(255,255,255,0.05)")
+            xaxis=dict(gridcolor=grid_color),
+            yaxis=dict(gridcolor=grid_color)
         )
         st.plotly_chart(fig_comp, width='stretch')
 
@@ -493,16 +632,16 @@ with tab_predictions:
 
     with col_layout_left:
         st.markdown("""
-        <div style='background: rgba(40, 44, 60, 0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);'>
+        <div style='background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);'>
             <h5 style='color: #4285f4; margin-top: 0px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;'>🎛️ Ovládací pult simulací</h5>
-            <hr style='border-color: rgba(255,255,255,0.05); margin: 10px 0 20px 0;'/>
+            <hr style='border-color: var(--sidebar-hr); margin: 10px 0 20px 0;'/>
         </div>
         """, unsafe_allow_html=True)
 
         pred_year = st.slider("Cílový rok projekce:", min_value=2026, max_value=2035, value=2030, step=1)
         deficit_threshold = st.slider("Kritický kapacitní deficit (%):", min_value=0.0, max_value=50.0, value=20.0, step=5.0)
 
-        st.markdown("<br/><b style='color:#8c96bc; font-size:0.8rem; text-transform:uppercase;'>Zásahy a investice:</b>", unsafe_allow_html=True)
+        st.markdown("<br/><b style='color:var(--metric-label-color); font-size:0.8rem; text-transform:uppercase;'>Zásahy a investice:</b>", unsafe_allow_html=True)
         sim_new_beds = st.number_input("Přidat nová lůžka:", min_value=0, max_value=500, value=0, step=10, key="sim_beds")
         sim_field_boost = st.slider("Posílit terénní služby:", min_value=0, max_value=30, value=0, step=5, key="sim_field",
                                     help="O kolik % klesne tlak na lůžka díky silnější pečovatelské službě doma.")
@@ -510,20 +649,20 @@ with tab_predictions:
         # NOVINKA: Čistá grafická legenda pro predikční mapu vložená přímo pod ovladače
         st.markdown("""
         <br/>
-        <div style='background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-top: 15px;'>
-            <b style='color:#ffffff; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px;'>🗺️ Legenda rizik mapy</b>
-            <hr style='border-color: rgba(255,255,255,0.05); margin: 8px 0;'/>
+        <div style='background: var(--tab-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--tab-border); margin-top: 15px;'>
+            <b style='color:var(--text-color); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px;'>🗺️ Legenda rizik mapy</b>
+            <hr style='border-color: var(--sidebar-hr); margin: 8px 0;'/>
             <div style='display: flex; align-items: center; margin-bottom: 8px;'>
                 <div style='width: 12px; height: 12px; background-color: #2ec4b6; border-radius: 50%; margin-right: 10px;'></div>
-                <span style='color: #c4ccdf; font-size: 0.85rem;'><strong>Bezpečný stav</strong> (Dostatek kapacit)</span>
+                <span style='color: var(--text-color); font-size: 0.85rem;'><strong>Bezpečný stav</strong> (Dostatek kapacit)</span>
             </div>
             <div style='display: flex; align-items: center; margin-bottom: 8px;'>
                 <div style='width: 12px; height: 12px; background-color: #ff9f1c; border-radius: 50%; margin-right: 10px;'></div>
-                <span style='color: #c4ccdf; font-size: 0.85rem;'><strong>Mírný deficit</strong> (Do limitu alarmu)</span>
+                <span style='color: var(--text-color); font-size: 0.85rem;'><strong>Mírný deficit</strong> (Do limitu alarmu)</span>
             </div>
             <div style='display: flex; align-items: center;'>
                 <div style='width: 12px; height: 12px; background-color: #dc3545; border-radius: 50%; margin-right: 10px;'></div>
-                <span style='color: #c4ccdf; font-size: 0.85rem;'><strong>Kritický stav</strong> (Překročen nastavený limit)</span>
+                <span style='color: var(--text-color); font-size: 0.85rem;'><strong>Kritický stav</strong> (Překročen nastavený limit)</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -575,7 +714,7 @@ with tab_predictions:
         col_inner_map, col_inner_chart = st.columns([1.2, 1])
 
         with col_inner_map:
-            m_pred = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles="cartodbpositron")
+            m_pred = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles=map_tiles)
             pred_geo = copy.deepcopy(geojson_data)
 
             for feature in pred_geo.get("features", []):
@@ -657,16 +796,19 @@ with tab_predictions:
             fig_trend.add_trace(go.Scatter(x=[2026, 2035], y=[sim_cap_line, sim_cap_line], name="Simulovaná kapacita lůžek", line=dict(color="#2ec4b6", width=2, dash="dashdot")))
 
             fig_trend.update_layout(
-                template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                template=plotly_template, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                font=dict(color=font_color),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
                 margin=dict(l=10, r=10, t=40, b=10), height=400
             )
+            fig_trend.update_xaxes(gridcolor=grid_color)
+            fig_trend.update_yaxes(gridcolor=grid_color)
             st.plotly_chart(fig_trend, width='stretch')
 
-    st.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 30px 0px;'/>", unsafe_allow_html=True)
+    st.markdown("<hr style='border-color: var(--sidebar-hr); margin: 30px 0px;'/>", unsafe_allow_html=True)
 
     # 3. White Spots Index Ranking
-    st.markdown(f"<h5 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Identifikace \"Bílých míst\" (Nepokrytá území s vysokým rizikem v roce {pred_year})</h5>", unsafe_allow_html=True)
+    st.markdown(f"<h5 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Identifikace \"Bílých míst\" (Nepokrytá území s vysokým rizikem v roce {pred_year})</h5>", unsafe_allow_html=True)
 
     # Toggle to show White Spot analysis
     show_white_spots = st.checkbox("Zobrazit detailní analýzu Bílých míst (White Spots Index)", value=True)
@@ -688,17 +830,26 @@ with tab_predictions:
                 labels={"white_spot_index": "Index Bílého místa (WSI)", "orp": ""},
                 height=380
             )
-            fig_ws.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10), coloraxis_showscale=False)
+            fig_ws.update_layout(
+                template=plotly_template,
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font=dict(color=font_color),
+                margin=dict(l=10, r=10, t=10, b=10),
+                coloraxis_showscale=False
+            )
+            fig_ws.update_xaxes(gridcolor=grid_color)
+            fig_ws.update_yaxes(gridcolor=grid_color)
             st.plotly_chart(fig_ws, width='stretch')
 
         with col_ws_desc:
             st.markdown("""
             <div class="metric-card white-spot-card" style="margin-top: 15px;">
                 <div style="font-weight: 800; font-size: 1.1rem; color: #ff6b6b; margin-bottom: 10px;">Metodika White Spot Indexu (WSI)</div>
-                <p style="font-size: 0.9rem; color: #c4ccdf; line-height: 1.5; margin-bottom: 10px;">
+                <p style="font-size: 0.9rem; color: var(--text-color); line-height: 1.5; margin-bottom: 10px;">
                     <strong>Index bílých míst (WSI)</strong> identifikuje regiony, které vyžadují naléhavou pozornost. Index kombinuje sociální stres (nezaměstnanost, exekuce, vyloučené lokality) a očekávané tempo stárnutí ku lokální kapacitě služeb.
                 </p>
-                <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 0.85rem; color: #ffbe0b;">
+                <div style="background: var(--code-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--tab-border); font-family: monospace; font-size: 0.85rem; color: #ffbe0b;">
                     WSI = (Socioekonomický stres * Růst populace 75+) * 100 / (Kapacita služeb + 10)
                 </div>
             </div>
@@ -710,7 +861,7 @@ with tab_predictions:
 
 # ----------------- TAB 3: REPORTY A EXPORT -----------------
 with tab_exports:
-    st.markdown("<h4 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Exekutivní shrnutí a exporty datových sad</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Exekutivní shrnutí a exporty datových sad</h4>", unsafe_allow_html=True)
 
     # 1. Executive Summary Generator block
     st.markdown("### 📝 Exekutivní analýza pro vybrané území")
@@ -719,12 +870,12 @@ with tab_exports:
         stressed_orps = [p["orp"] for p in predictions_val.values() if p["stress_alert"]]
         st.markdown(f"""
         <div class="metric-card" style="border-left: 5px solid #ff4b4b !important;">
-            <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin-bottom: 10px;">KRITICKÁ ANALÝZA ÚSTECKÉHO KRAJE (Horizont do roku 2035)</div>
-            <p style="color: #c4ccdf; line-height: 1.6; font-size: 0.95rem;">
+            <div style="font-size: 1.3rem; font-weight: 800; color: var(--text-color); margin-bottom: 10px;">KRITICKÁ ANALÝZA ÚSTECKÉHO KRAJE (Horizont do roku 2035)</div>
+            <p style="color: var(--text-color); line-height: 1.6; font-size: 0.95rem;">
                 Ústecký kraj čelí kombinovanému tlaku: vysokému socioekonomickému znevýhodnění a výrazně zrychlenému stárnutí populace.
                 Do roku 2035 dojde v celém kraji k nárůstu populace starší 75 let o průměrně 35-40 %.
             </p>
-            <div style="margin: 15px 0px; padding: 12px; background: rgba(220, 53, 69, 0.08); border: 1px solid rgba(220, 53, 69, 0.2); border-radius: 8px;">
+            <div style="margin: 15px 0px; padding: 12px; background: var(--white-spot-bg); border: 1px solid var(--white-spot-border); border-radius: 8px;">
                 <strong>🚨 Hlavní kapacitní rizika (Kritický deficit kapacit nad {deficit_threshold}%):</strong><br/>
                 Kritické ohrožení je v roce {pred_year} detekováno v {len(stressed_orps)} z 16 ORP: <strong>{", ".join(stressed_orps)}</strong>.
             </div>
@@ -760,14 +911,14 @@ with tab_exports:
 
         st.markdown(f"""
         <div class="metric-card" style="{risk_border}">
-            <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin-bottom: 5px;">HODNOCENÍ ÚZEMÍ: ORP {selected_orp}</div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: var(--text-color); margin-bottom: 5px;">HODNOCENÍ ÚZEMÍ: ORP {selected_orp}</div>
             <div style="font-size: 0.9rem; font-weight: 600; color: #ffbe0b; margin-bottom: 15px;">{risk_title}</div>
-            <p style="color: #c4ccdf; font-size: 0.95rem;">
+            <p style="color: var(--text-color); font-size: 0.95rem;">
                 Míra nezaměstsnanosti: <strong>{orp_p['unemployment_rate']} %</strong> | Obyvatel v exekuci: <strong>{orp_p['exekuce_rate']} %</strong><br/>
                 Populace seniorů nad 75 let vzroste do roku {pred_year} o <strong>{growth_pct} %</strong>.<br/>
                 Očekávaná teoretická poptávka: <strong>{orp_p['predicted_demand']} lůžek</strong> vs. stávající kapacita <strong>{orp_p['current_capacity']} lůžek</strong>.
             </p>
-            <div style="margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; color: #ffffff;">
+            <div style="margin-top: 15px; padding: 12px; background: var(--tab-bg); border-radius: 8px; color: var(--text-color);">
                 <strong>Doporučení:</strong> {risk_desc}
             </div>
         </div>
@@ -800,8 +951,8 @@ with tab_exports:
     with col_d2:
         st.markdown("""
         <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
-            <div style="font-weight: 600; color: #ffffff; margin-bottom: 10px;">Registr sociálních služeb</div>
-            <p style="font-size: 0.8rem; color: #8c96bc; min-height: 50px;">Seznam aktuálních poskytovatelů péče s kapacitami a GPS v aktivním území.</p>
+            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 10px;">Registr sociálních služeb</div>
+            <p style="font-size: 0.8rem; color: var(--metric-label-color); min-height: 50px;">Seznam aktuálních poskytovatelů péče s kapacitami a GPS v aktivním území.</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -825,8 +976,8 @@ with tab_exports:
     with col_d3:
         st.markdown("""
         <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
-            <div style="font-weight: 600; color: #ffffff; margin-bottom: 10px;">Kompletní predikční data</div>
-            <p style="font-size: 0.8rem; color: #8c96bc; min-height: 50px;">Kompletní modelové výstupy deficitů pro všechny ORP v roce {pred_year} (JSON format).</p>
+            <div style="font-weight: 600; color: var(--text-color); margin-bottom: 10px;">Kompletní predikční data</div>
+            <p style="font-size: 0.8rem; color: var(--metric-label-color); min-height: 50px;">Kompletní modelové výstupy deficitů pro všechny ORP v roce {pred_year} (JSON format).</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -843,8 +994,8 @@ with tab_exports:
 
 # ----------------- TAB 4: DATA ČSSZ -----------------
 with tab_cssz:
-    st.markdown("<h4 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Údaje ČSSZ: Důchody a Nemocenské dávky</h4>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #c4ccdf; font-size: 0.95rem;'>Tato sekce obsahuje agregovaná (ukázková) data České správy sociálního zabezpečení (ČSSZ) pro vybrané území.</p>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color: var(--text-color); font-weight: 600; margin-bottom: 15px;'>Údaje ČSSZ: Důchody a Nemocenské dávky</h4>", unsafe_allow_html=True)
+    st.markdown("<p style='color: var(--text-color); font-size: 0.95rem;'>Tato sekce obsahuje agregovaná (ukázková) data České správy sociálního zabezpečení (ČSSZ) pro vybrané území.</p>", unsafe_allow_html=True)
 
     col_c1, col_c2, col_c3 = st.columns(3)
     with col_c1:

@@ -1,6 +1,46 @@
-/* Premium Glassmorphism and Custom Dark-Theme Styling for Streamlit */
+/* Premium Glassmorphism and Custom Responsive Styling for Streamlit */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+    /* DEFAULT (DARK) THEME VARIABLES */
+    --app-bg: #0d0f14;
+    --app-bg-gradient: radial-gradient(at 10% 20%, rgba(31, 38, 135, 0.15) 0px, transparent 50%),
+                       radial-gradient(at 90% 80%, rgba(220, 53, 69, 0.08) 0px, transparent 50%);
+    --card-bg: rgba(18, 22, 33, 0.65);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --card-hover-border: rgba(255, 255, 255, 0.2);
+    --card-hover-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.05);
+    
+    --white-spot-bg: rgba(220, 53, 69, 0.06);
+    --white-spot-border: rgba(220, 53, 69, 0.2);
+    --white-spot-hover-border: rgba(220, 53, 69, 0.5);
+    --white-spot-hover-shadow: 0 12px 40px 0 rgba(220, 53, 69, 0.15);
+    
+    --header-title-gradient: linear-gradient(135deg, #ffffff 30%, #a1a8c9 100%);
+    --header-subtitle-color: #8c96bc;
+    
+    --metric-value-color: #ffffff;
+    --metric-label-color: #8c96bc;
+    
+    --sidebar-bg: #090b0e;
+    --sidebar-border: rgba(255, 255, 255, 0.05);
+    --sidebar-text-primary: #ffffff;
+    --sidebar-text-muted: #525a7a;
+    --sidebar-hr: rgba(255, 255, 255, 0.05);
+    
+    --tab-bg: rgba(255, 255, 255, 0.02);
+    --tab-border: rgba(255, 255, 255, 0.04);
+    --tab-text: #8c96bc;
+    --tab-selected-bg: rgba(255, 255, 255, 0.08);
+    --tab-selected-text: #ffffff;
+    
+    --footer-color: #525a7a;
+    --footer-border: rgba(255, 255, 255, 0.03);
+    
+    --code-bg: rgba(0, 0, 0, 0.2);
+}
 
 /* Apply modern typography */
 html, body, [class*="css"], .stText, .stMarkdown {
@@ -8,55 +48,63 @@ html, body, [class*="css"], .stText, .stMarkdown {
 }
 
 /* Page Background and Layout adjustments */
-.main {
-    background-color: #0d0f14;
-    background-image: 
-        radial-gradient(at 10% 20%, rgba(31, 38, 135, 0.15) 0px, transparent 50%),
-        radial-gradient(at 90% 80%, rgba(220, 53, 69, 0.08) 0px, transparent 50%);
-    background-attachment: fixed;
+.main, [data-testid="stAppViewContainer"], .stApp {
+    background-color: var(--app-bg) !important;
+    background-image: var(--app-bg-gradient) !important;
+    background-attachment: fixed !important;
+}
+
+[data-testid="stHeader"] {
+    background-color: transparent !important;
 }
 
 /* Custom premium card panels */
 .metric-card {
-    background: rgba(18, 22, 33, 0.65) !important;
+    background: var(--card-bg) !important;
     backdrop-filter: blur(16px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
     border-radius: 16px !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid var(--card-border) !important;
     padding: 24px !important;
     margin: 12px 0px !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    box-shadow: var(--card-shadow) !important;
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 .metric-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--card-hover-border) !important;
+    box-shadow: var(--card-hover-shadow) !important;
 }
 
 /* Highlighted "White Spot" cards */
 .white-spot-card {
-    background: rgba(220, 53, 69, 0.06) !important;
-    border: 1px solid rgba(220, 53, 69, 0.2) !important;
+    background: var(--white-spot-bg) !important;
+    border: 1px solid var(--white-spot-border) !important;
 }
 
 .white-spot-card:hover {
-    border-color: rgba(220, 53, 69, 0.5) !important;
-    box-shadow: 0 12px 40px 0 rgba(220, 53, 69, 0.15) !important;
+    border-color: var(--white-spot-hover-border) !important;
+    box-shadow: var(--white-spot-hover-shadow) !important;
+}
+
+/* Heading element overrides */
+h1, h2, h3, h4, h5, h6, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {
+    color: var(--text-color) !important;
 }
 
 /* Header Gradient */
 .header-title {
-    background: linear-gradient(135deg, #ffffff 30%, #a1a8c9 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: var(--header-title-gradient) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
     font-weight: 800;
     letter-spacing: -1px;
 }
 
 .header-subtitle {
-    color: #8c96bc;
+    color: var(--header-subtitle-color) !important;
     font-weight: 300;
     margin-bottom: 25px;
 }
@@ -81,7 +129,7 @@ html, body, [class*="css"], .stText, .stMarkdown {
 .metric-value {
     font-size: 2.2rem;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--metric-value-color);
     line-height: 1.2;
     margin: 8px 0px;
 }
@@ -91,7 +139,7 @@ html, body, [class*="css"], .stText, .stMarkdown {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #8c96bc;
+    color: var(--metric-label-color);
 }
 
 .metric-trend {
@@ -109,8 +157,8 @@ html, body, [class*="css"], .stText, .stMarkdown {
 
 /* Clean sidebar styling */
 [data-testid="stSidebar"] {
-    background-color: #090b0e !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--sidebar-border) !important;
 }
 
 /* Override Streamlit container padding */
@@ -122,31 +170,31 @@ html, body, [class*="css"], .stText, .stMarkdown {
 /* Customize tab bar styling */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px;
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: var(--tab-bg);
     padding: 6px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--tab-border);
 }
 
 .stTabs [data-baseweb="tab"] {
     border-radius: 8px;
     padding: 10px 20px;
-    color: #8c96bc;
+    color: var(--tab-text);
     transition: all 0.2s ease;
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    color: #ffffff !important;
+    background-color: var(--tab-selected-bg) !important;
+    color: var(--tab-selected-text) !important;
     font-weight: 600 !important;
 }
 
 /* Custom footer */
 .app-footer {
     text-align: center;
-    color: #525a7a;
+    color: var(--footer-color);
     font-size: 0.8rem;
     margin-top: 50px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-top: 1px solid var(--footer-border);
 }
