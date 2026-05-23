@@ -109,25 +109,47 @@ def fallback_fetch(endpoint, params=None):
     else:
         raise ValueError(f"Unknown endpoint: {endpoint}")
 
-# Helper to extract ORP name from streamlit-folium click output
+# Robustní detekce kliknutí na polygon v mapě
 def get_clicked_orp_name(map_output):
     if not map_output:
         return None
-    click_info = map_output.get("last_object_clicked")
+
+    click_info = map_output.get("last_active_drawing") or map_output.get("last_object_clicked")
     if not click_info:
         return None
+
     if isinstance(click_info, dict):
         properties = click_info.get("properties")
         if isinstance(properties, dict):
             name = properties.get("name")
             if name:
                 return name
-        # If not in properties, try the 'id' field
         feature_id = click_info.get("id")
-        if feature_id and isinstance(feature_id, str):
+        if feature_id and isinstance(feature_id, str) and not feature_id.startswith("marker"):
             return feature_id
-    elif isinstance(click_info, str):
-        return click_info
+    return None
+
+# Helper to calculate bounds from GeoJSON geometry
+def get_feature_bounds(geometry):
+    if not geometry or "coordinates" not in geometry:
+        return None
+
+    coords = geometry["coordinates"]
+    all_lats = []
+    all_lons = []
+
+    def extract_coords(coord_array):
+        for item in coord_array:
+            if isinstance(item[0], (int, float)):
+                all_lons.append(item[0])
+                all_lats.append(item[1])
+            else:
+                extract_coords(item)
+
+    extract_coords(coords)
+
+    if all_lats and all_lons:
+        return [[min(all_lats), min(all_lons)], [max(all_lats), max(all_lons)]]
     return None
 
 # Helper to load and inject custom stylesheet
@@ -140,10 +162,6 @@ css_path = os.path.join(os.path.dirname(__file__), "style.css")
 if os.path.exists(css_path):
     local_css(css_path)
 
-# Initialize Session State
-if "selected_orp" not in st.session_state:
-    st.session_state.selected_orp = "Celý kraj"
-
 # Fetch global datasets
 try:
     indicators = fetch_data("/api/orp/indicators")
@@ -155,9 +173,17 @@ except Exception as e:
     st.error(f"Nepodařilo se načíst základní data. Zkontrolujte prosím přítomnost souborů ve složce data/. Detaily: {e}")
     st.stop()
 
-# Ensure each GeoJSON feature has the name as its root ID for Folium click mapping
 for feature in geojson_data.get("features", []):
     feature["id"] = feature["properties"]["name"]
+
+# --- MECHANISMUS DIALOGU MEZI MAPOU A SIDEBAREM ---
+if "selected_orp" not in st.session_state:
+    st.session_state.selected_orp = "Celý kraj"
+
+if "menu_version" not in st.session_state:
+    st.session_state.menu_version = 0
+
+orp_options = ["Celý kraj"] + sorted(list(indicators.keys()))
 
 # ----------------- SIDEBAR PANEL -----------------
 st.sidebar.markdown("""
@@ -167,28 +193,27 @@ st.sidebar.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Selected ORP selector
-orp_options = ["Celý kraj"] + sorted(list(indicators.keys()))
 try:
-    default_idx = orp_options.index(st.session_state.selected_orp)
+    current_index = orp_options.index(st.session_state.selected_orp)
 except ValueError:
-    default_idx = 0
+    current_index = 0
+
+def on_sidebar_change():
+    dynamic_key = f"orp_sidebar_select_v_{st.session_state.menu_version}"
+    st.session_state.selected_orp = st.session_state[dynamic_key]
 
 selected_orp = st.sidebar.selectbox(
     "Vyberte území (ORP):",
     orp_options,
-    index=default_idx,
-    key="orp_sidebar_select"
+    index=current_index,
+    key=f"orp_sidebar_select_v_{st.session_state.menu_version}",
+    on_change=on_sidebar_change
 )
 
-# Sync sidebar select back to session state
-if selected_orp != st.session_state.selected_orp:
-    st.session_state.selected_orp = selected_orp
-    st.rerun()
+selected_orp = st.session_state.selected_orp
 
 st.sidebar.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 15px 0px;'/>", unsafe_allow_html=True)
 
-# Map visual options
 st.sidebar.subheader("Vrstvy mapy (Sociální Atlas)")
 selected_indicator_label = st.sidebar.selectbox(
     "Zobrazovaný indikátor:",
@@ -201,7 +226,6 @@ selected_indicator_label = st.sidebar.selectbox(
     ]
 )
 
-# Mapping selections to data keys
 INDICATOR_MAPPING = {
     "Míra nezaměstnanosti (%)": ("unemployment_rate", "%", "unemployment_rate", cm.linear.YlOrRd_09),
     "Podíl obyvatel v exekuci (%)": ("exekuce_rate", "%", "exekuce_rate", cm.linear.OrRd_09),
@@ -212,14 +236,11 @@ INDICATOR_MAPPING = {
 
 indicator_key, indicator_unit, indicator_title, colormap_fn = INDICATOR_MAPPING[selected_indicator_label]
 
-st.sidebar.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 15px 0px;'/>", unsafe_allow_html=True)
-
 st.sidebar.subheader("Zobrazit body zájmu (POI):")
 show_stationary = st.sidebar.checkbox("Pobytová zařízení (red)", value=True)
 show_field = st.sidebar.checkbox("Terénní služby (green)", value=True)
 show_shelters = st.sidebar.checkbox("Azylové domy (blue)", value=False)
 
-# Add sidebar context info
 st.sidebar.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 15px 0px;'/>", unsafe_allow_html=True)
 st.sidebar.markdown("""
 <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
@@ -231,7 +252,6 @@ st.sidebar.markdown("""
 
 # ----------------- MAIN APP CONTENT -----------------
 
-# Header Section
 st.markdown("""
 <div style="text-align: center; margin-top: 10px; margin-bottom: 30px;">
     <h1 class="header-title" style="font-size: 2.8rem; margin-bottom: 0px; text-transform: uppercase;">Prediktivní Sociální Atlas</h1>
@@ -239,7 +259,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Helper function to render metric cards mapping to CSS classes
 def render_metric_card(label, value, trend_text="", trend_direction="none", extra_class=""):
     trend_html = ""
     if trend_direction == "up":
@@ -269,58 +288,65 @@ tab_atlas, tab_predictions, tab_exports, tab_cssz = st.tabs([
 with tab_atlas:
     st.markdown("<h4 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Současná sociální a demografická situace</h4>", unsafe_allow_html=True)
 
-    # 1. Row of KPI metric cards
     col1, col2, col3, col4 = st.columns(4)
 
-    # Calculations based on selected ORP
     if selected_orp == "Celý kraj":
         total_pop_2025 = sum(dem[2025-2018]["total_pop"] for dem in fetch_data("/api/orp/demographics").values())
-        avg_unemployment = round(np.mean([ind["unemployment_rate"] for ind in indicators.values()]), 1)
-        avg_exekuce = round(np.mean([ind["exekuce_rate"] for ind in indicators.values()]), 1)
-        total_capacity = sum(s["capacity"] for s in services)
+        avg_indicator = round(np.mean([ind[indicator_key] for ind in indicators.values()]), 1)
+        max_orp, max_record = max(indicators.items(), key=lambda item: item[1][indicator_key])
+        min_orp, min_record = min(indicators.items(), key=lambda item: item[1][indicator_key])
+        max_value = max_record[indicator_key]
+        min_value = min_record[indicator_key]
+        range_indicator = round(max_value - min_value, 1)
 
         with col1:
-            render_metric_card("Celková populace kraje (2025)", f"{total_pop_2025:,}".replace(",", " "), "Stabilní vývoj", "none")
+            render_metric_card(f"Průměr {selected_indicator_label}", f"{avg_indicator} {indicator_unit}", "Současný krajský průměr", "none")
         with col2:
-            render_metric_card("Průměrná nezaměstnanost", f"{avg_unemployment} %", "Nejvyšší v ČR", "up")
+            render_metric_card("Nejvyšší ORP", f"{max_orp}: {max_value} {indicator_unit}", "Nejvyšší hodnota v kraji", "up")
         with col3:
-            render_metric_card("Podíl obyvatel v exekuci", f"{avg_exekuce} %", "Závažný socioekonomický stres", "up")
+            render_metric_card("Nejnižší ORP", f"{min_orp}: {min_value} {indicator_unit}", "Nejnižší hodnota v kraji", "down")
         with col4:
-            render_metric_card("Celková lůžková kapacita (DS)", f"{total_capacity} lůžek", f"Celkem {len(services)} poskytovatelů", "none")
+            render_metric_card(f"Rozpětí {selected_indicator_label}", f"{range_indicator} {indicator_unit}", f"Rozdíl mezi {max_orp} a {min_orp}", "none")
     else:
         hist_dem = fetch_data("/api/orp/demographics")[selected_orp]
         pop_2025 = hist_dem[-1]["total_pop"]
-        unemp = indicators[selected_orp]["unemployment_rate"]
-        exek = indicators[selected_orp]["exekuce_rate"]
+        indicator_value = indicators[selected_orp][indicator_key]
+        avg_indicator = round(np.mean([ind[indicator_key] for orp, ind in indicators.items() if orp != selected_orp]), 1)
+        diff_value = round(indicator_value - avg_indicator, 1)
+        diff_direction = "up" if diff_value > 0 else "down" if diff_value < 0 else "none"
+        diff_text = f"{abs(diff_value)} {indicator_unit} {'nad' if diff_value > 0 else 'pod' if diff_value < 0 else 've shodě s'} průměrem"
         orp_capacity = sum(s["capacity"] for s in services if s["orp"] == selected_orp)
 
         with col1:
-            render_metric_card(f"Populace - {selected_orp} (2025)", f"{pop_2025:,}".replace(",", " "), "Dle dat ČSÚ", "none")
+            render_metric_card(selected_indicator_label, f"{indicator_value} {indicator_unit}", f"ORP {selected_orp}", diff_direction)
         with col2:
-            render_metric_card("Míra nezaměstnanosti", f"{unemp} %", "Krajský průměr: 6.7%", "up" if unemp > 6.7 else "down")
+            render_metric_card(f"Krajský průměr {selected_indicator_label}", f"{avg_indicator} {indicator_unit}", "Průměr ostatních ORP", "none")
         with col3:
-            render_metric_card("Podíl obyvatel v exekuci", f"{exek} %", "Krajský průměr: 13.5%", "up" if exek > 13.5 else "down")
+            render_metric_card("Rozdíl proti průměru", f"{abs(diff_value)} {indicator_unit}", diff_text, diff_direction)
         with col4:
-            render_metric_card("Lůžková kapacita (DS)", f"{orp_capacity} lůžek", f"V ORP {selected_orp}", "none")
+            render_metric_card("Populace 2025", f"{pop_2025:,}".replace(",", " "), "Dle dat ČSÚ", "none")
 
     st.markdown("<br/>", unsafe_allow_html=True)
 
-    # 2. Main Visualization Row: Map (left) + Side Comparison charts (right)
     col_map, col_chart = st.columns([5, 4])
 
     with col_map:
         st.markdown(f"<div style='font-size: 0.9rem; color: #8c96bc; margin-bottom: 10px; font-weight: 600;'>KARTOGRAFICKÉ ZOBRAZENÍ: {selected_indicator_label}</div>", unsafe_allow_html=True)
 
-        # Prepare Map
-        # Base map centering Ústí region
         m = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles="cartodbpositron")
 
-        # Merge selected indicator value into GeoJSON feature properties for tooltip
+        if selected_orp != "Celý kraj":
+            for feature in geojson_data.get("features", []):
+                if feature["properties"]["name"] == selected_orp:
+                    bounds = get_feature_bounds(feature["geometry"])
+                    if bounds:
+                        m.fit_bounds(bounds, padding=(0.05, 0.05))
+                    break
+
         map_geo = copy.deepcopy(geojson_data)
         values = [ind[indicator_key] for ind in indicators.values()]
         min_val, max_val = min(values), max(values)
 
-        # Initialize color map
         colormap = colormap_fn.scale(min_val, max_val)
         colormap.caption = f"{selected_indicator_label}"
         colormap.add_to(m)
@@ -333,7 +359,6 @@ with tab_atlas:
 
         def style_fn(feature):
             val = feature["properties"].get("indicator_val", 0.0)
-            # Custom styling function
             name = feature["properties"]["name"]
             is_selected = (name == selected_orp)
             return {
@@ -359,20 +384,19 @@ with tab_atlas:
         )
 
         folium.GeoJson(
-            map_geo,
+            data=map_geo,
             style_function=style_fn,
             highlight_function=highlight_fn,
             tooltip=tooltip_widget,
+            popup=folium.GeoJsonPopup(fields=["name"], labels=False),
             name="ORP Hranice"
         ).add_to(m)
 
-        # Overlay Social Services markers
         fg_stationary = folium.FeatureGroup(name="Pobytová zařízení (DS)", show=show_stationary)
         fg_field = folium.FeatureGroup(name="Terénní služby", show=show_field)
         fg_shelters = folium.FeatureGroup(name="Azylové domy", show=show_shelters)
 
         for s in services:
-            # Highlight only current ORP markers if specific ORP is selected
             if selected_orp != "Celý kraj" and s["orp"] != selected_orp:
                 continue
 
@@ -420,17 +444,16 @@ with tab_atlas:
         if show_shelters:
             fg_shelters.add_to(m)
 
-        # Render Folium Map in Streamlit
         map_output = st_folium(m, height=450, width='stretch', key="atlas_map")
 
-        # Check map selection click and update selected ORP
         clicked_name = get_clicked_orp_name(map_output)
-        if clicked_name and clicked_name in indicators.keys() and clicked_name != st.session_state.selected_orp:
-            st.session_state.selected_orp = clicked_name
-            st.rerun()
+        if clicked_name and clicked_name in indicators.keys():
+            if clicked_name != st.session_state.selected_orp:
+                st.session_state.selected_orp = clicked_name
+                st.session_state.menu_version += 1
+                st.rerun()
 
     with col_chart:
-        # Side comparison bar chart
         st.markdown("<div style='font-size: 0.9rem; color: #8c96bc; margin-bottom: 10px; font-weight: 600;'>POROVNÁNÍ NAPŘÍČ OBLASTMI</div>", unsafe_allow_html=True)
 
         comp_list = []
@@ -465,212 +488,180 @@ with tab_atlas:
 
 # ----------------- TAB 2: PREDIKTIVNÍ MODEL -----------------
 with tab_predictions:
-    st.markdown("<h4 style='color: #ffffff; font-weight: 600; margin-bottom: 15px;'>Predikce a modelování kapacit pobytové péče (2026–2035)</h4>", unsafe_allow_html=True)
 
-    # Parameter sliders
-    col_s1, col_s2 = st.columns(2)
-    with col_s1:
+    col_layout_left, col_layout_right = st.columns([1, 2.5])
+
+    with col_layout_left:
+        st.markdown("""
+        <div style='background: rgba(40, 44, 60, 0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);'>
+            <h5 style='color: #4285f4; margin-top: 0px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;'>🎛️ Ovládací pult simulací</h5>
+            <hr style='border-color: rgba(255,255,255,0.05); margin: 10px 0 20px 0;'/>
+        </div>
+        """, unsafe_allow_html=True)
+
         pred_year = st.slider("Cílový rok projekce:", min_value=2026, max_value=2035, value=2030, step=1)
-    with col_s2:
-        deficit_threshold = st.slider("Kritický kapacitní deficit (%):", min_value=0.0, max_value=50.0, value=20.0, step=5.0,
-                                      help="Hodnota kapacitního deficitu, nad kterou je oblast označena varovnou červenou barvou z důvodu ohrožení nedostatečnou kapacitou.")
+        deficit_threshold = st.slider("Kritický kapacitní deficit (%):", min_value=0.0, max_value=50.0, value=20.0, step=5.0)
 
-    st.markdown("<br/>", unsafe_allow_html=True)
+        st.markdown("<br/><b style='color:#8c96bc; font-size:0.8rem; text-transform:uppercase;'>Zásahy a investice:</b>", unsafe_allow_html=True)
+        sim_new_beds = st.number_input("Přidat nová lůžka:", min_value=0, max_value=500, value=0, step=10, key="sim_beds")
+        sim_field_boost = st.slider("Posílit terénní služby:", min_value=0, max_value=30, value=0, step=5, key="sim_field",
+                                    help="O kolik % klesne tlak na lůžka díky silnější pečovatelské službě doma.")
 
-    # Fetch predictions for targeted year and threshold
-    predictions_val = fetch_data("/api/predictions", {"year": pred_year, "capacity_deficit_threshold": deficit_threshold})
+        # NOVINKA: Čistá grafická legenda pro predikční mapu vložená přímo pod ovladače
+        st.markdown("""
+        <br/>
+        <div style='background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-top: 15px;'>
+            <b style='color:#ffffff; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px;'>🗺️ Legenda rizik mapy</b>
+            <hr style='border-color: rgba(255,255,255,0.05); margin: 8px 0;'/>
+            <div style='display: flex; align-items: center; margin-bottom: 8px;'>
+                <div style='width: 12px; height: 12px; background-color: #2ec4b6; border-radius: 50%; margin-right: 10px;'></div>
+                <span style='color: #c4ccdf; font-size: 0.85rem;'><strong>Bezpečný stav</strong> (Dostatek kapacit)</span>
+            </div>
+            <div style='display: flex; align-items: center; margin-bottom: 8px;'>
+                <div style='width: 12px; height: 12px; background-color: #ff9f1c; border-radius: 50%; margin-right: 10px;'></div>
+                <span style='color: #c4ccdf; font-size: 0.85rem;'><strong>Mírný deficit</strong> (Do limitu alarmu)</span>
+            </div>
+            <div style='display: flex; align-items: center;'>
+                <div style='width: 12px; height: 12px; background-color: #dc3545; border-radius: 50%; margin-right: 10px;'></div>
+                <span style='color: #c4ccdf; font-size: 0.85rem;'><strong>Kritický stav</strong> (Překročen nastavený limit)</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # 1. Highlight Capacity Deficits KPI Cards
-    col_p1, col_p2, col_p3, col_p4 = st.columns(4)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    if selected_orp == "Celý kraj":
-        total_capacity_2025 = sum(p["current_capacity"] for p in predictions_val.values())
-        total_demand_pred = sum(p["predicted_demand"] for p in predictions_val.values())
-        weighted_deficit_pct = round(((total_demand_pred - total_capacity_2025) / total_capacity_2025) * 100.0, 1) if total_capacity_2025 > 0 else 0
-        stressed_orps_count = sum(1 for p in predictions_val.values() if p["stress_alert"])
+    with col_layout_right:
+        predictions_raw = fetch_data("/api/predictions", {"year": pred_year, "capacity_deficit_threshold": deficit_threshold})
 
-        with col_p1:
-            render_metric_card(f"Předpovídaná poptávka kraje ({pred_year})", f"{total_demand_pred:,}".replace(",", " ") + " lůžek", "Založeno na stárnutí 75+", "none")
-        with col_p2:
-            render_metric_card("Stabilní kapacita lůžek", f"{total_capacity_2025:,}".replace(",", " ") + " lůžek", "Současný stav v kraji", "none")
-        with col_p3:
-            is_crit = weighted_deficit_pct >= deficit_threshold
-            render_metric_card(
-                "Celkový deficit kraje",
-                f"{weighted_deficit_pct} %",
-                "Průměrný deficit kapacit",
-                "up" if weighted_deficit_pct > 0 else "none",
-                extra_class="glow-alert" if is_crit else ""
-            )
-        with col_p4:
-            render_metric_card(
-                "Počet ORP v kritickém deficitu",
-                f"{stressed_orps_count} / 16",
-                f"Deficit > {deficit_threshold}%",
-                "up" if stressed_orps_count > 0 else "none",
-                extra_class="glow-alert" if stressed_orps_count > 4 else ""
-            )
-    else:
-        orp_pred = predictions_val[selected_orp]
-        demand_pred = orp_pred["predicted_demand"]
-        cap_2025 = orp_pred["current_capacity"]
-        def_pct = orp_pred["deficit_percent"]
-        growth_75plus = round(((orp_pred["pop_75plus"] - orp_pred["hist_2025_pop_75plus"]) / orp_pred["hist_2025_pop_75plus"]) * 100.0, 1)
+        predictions_val = copy.deepcopy(predictions_raw)
+        for orp_key, o_data in predictions_val.items():
+            is_target = (selected_orp == "Celý kraj" or orp_key == selected_orp)
+            if is_target:
+                o_data["current_capacity"] += sim_new_beds
+                o_data["predicted_demand"] = max(0, int(o_data["predicted_demand"] * (1 - (sim_field_boost / 100.0))))
 
-        with col_p1:
-            render_metric_card(f"Očekávaná poptávka ({pred_year})", f"{demand_pred} lůžek", f"Pop. 75+: {orp_pred['pop_75plus']} obyv.", "none")
-        with col_p2:
-            render_metric_card("Stávající kapacita lůžek", f"{cap_2025} lůžek", f"V ORP {selected_orp}", "none")
-        with col_p3:
-            is_crit = orp_pred["stress_alert"]
-            render_metric_card(
-                "Deficit kapacit",
-                f"{def_pct} %",
-                f"Srovnání poptávky s kapacitou",
-                "up" if def_pct > 0 else "none",
-                extra_class="glow-alert" if is_crit else ""
-            )
-        with col_p4:
-            render_metric_card("Nárůst seniorů 75+ (do r. " + str(pred_year) + ")", f"+ {growth_75plus} %", "Oproti roku 2025", "up")
-
-    st.markdown("<br/>", unsafe_allow_html=True)
-
-    # 2. Prediction Maps & Demographic Trend Plots
-    col_p_map, col_p_chart = st.columns([5, 4])
-
-    with col_p_map:
-        st.markdown(f"<div style='font-size: 0.9rem; color: #8c96bc; margin-bottom: 10px; font-weight: 600;'>KAPACITNÍ DEFICITY V ROCE {pred_year} (ČERVENÁ = ALARM DEFICITU > {deficit_threshold}%)</div>", unsafe_allow_html=True)
-
-        m_pred = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles="cartodbpositron")
-        pred_geo = copy.deepcopy(geojson_data)
-
-        for feature in pred_geo.get("features", []):
-            name = feature["properties"]["name"]
-            pred = predictions_val.get(name, {})
-            feature["properties"]["current_capacity"] = pred.get("current_capacity", 0)
-            feature["properties"]["predicted_demand"] = pred.get("predicted_demand", 0)
-            feature["properties"]["deficit_percent"] = pred.get("deficit_percent", 0.0)
-            feature["properties"]["stress_alert"] = pred.get("stress_alert", False)
-
-        def pred_style_fn(feature):
-            name = feature["properties"]["name"]
-            alert = feature["properties"].get("stress_alert", False)
-            deficit = feature["properties"].get("deficit_percent", 0.0)
-            is_selected = (name == selected_orp)
-
-            if alert:
-                fill_col = "#dc3545" # warning alert red
-                line_weight = 3 if is_selected else 1.5
-            elif deficit > 0:
-                fill_col = "#ff9f1c" # warning moderate orange
-                line_weight = 3 if is_selected else 1.2
+            new_gap = o_data["predicted_demand"] - o_data["current_capacity"]
+            if o_data["current_capacity"] > 0:
+                o_data["deficit_percent"] = round((new_gap / o_data["current_capacity"]) * 100.0, 1)
             else:
-                fill_col = "#2ec4b6" # satisfactory green
-                line_weight = 3 if is_selected else 1.0
+                o_data["deficit_percent"] = 100.0 if new_gap > 0 else 0.0
 
-            return {
-                "fillColor": fill_col,
-                "color": "#ffffff" if is_selected else "#444444",
-                "weight": line_weight,
-                "fillOpacity": 0.7 if is_selected else 0.5,
-            }
+            o_data["stress_alert"] = o_data["deficit_percent"] >= deficit_threshold
 
-        def pred_highlight_fn(feature):
-            return {
-                "weight": 3.5,
-                "color": "#ffffff",
-                "fillOpacity": 0.8
-            }
+        col_p1, col_p2, col_p3 = st.columns(3)
 
-        tooltip_pred = folium.GeoJsonTooltip(
-            fields=["name", "current_capacity", "predicted_demand", "deficit_percent"],
-            aliases=["ORP:", "Kapacita lůžek:", "Očekávaná poptávka:", "Kapacitní deficit (%):"],
-            localize=True,
-            sticky=True,
-            labels=True
-        )
+        if selected_orp == "Celý kraj":
+            total_capacity_sim = sum(p["current_capacity"] for p in predictions_val.values())
+            total_demand_sim = sum(p["predicted_demand"] for p in predictions_val.values())
+            weighted_deficit_pct = round(((total_demand_sim - total_capacity_sim) / total_capacity_sim) * 100.0, 1) if total_capacity_sim > 0 else 0
 
-        folium.GeoJson(
-            pred_geo,
-            style_function=pred_style_fn,
-            highlight_function=pred_highlight_fn,
-            tooltip=tooltip_pred,
-            name="Predikce Deficitu"
-        ).add_to(m_pred)
+            with col_p1:
+                render_metric_card("Simulovaná poptávka", f"{total_demand_sim:,}".replace(",", " ") + " lůžek", "Po započtení terénu")
+            with col_p2:
+                render_metric_card("Simulovaná kapacita", f"{total_capacity_sim:,}".replace(",", " ") + " lůžek", f"Včetně +{sim_new_beds} lůžek")
+            with col_p3:
+                render_metric_card("Výsledný deficit kraje", f"{weighted_deficit_pct} %", "Stav celého kraje", "none", "glow-alert" if weighted_deficit_pct >= deficit_threshold else "")
+        else:
+            orp_pred = predictions_val[selected_orp]
+            with col_p1:
+                render_metric_card("Simulovaná poptávka", f"{orp_pred['predicted_demand']} lůžek", f"ORP {selected_orp}")
+            with col_p2:
+                render_metric_card("Simulovaná kapacita", f"{orp_pred['current_capacity']} lůžek", f"Původní: {predictions_raw[selected_orp]['current_capacity']}")
+            with col_p3:
+                render_metric_card("Deficit oblasti", f"{orp_pred['deficit_percent']} %", "Po simulaci investice", "none", "glow-alert" if orp_pred["stress_alert"] else "")
 
-        map_pred_output = st_folium(m_pred, height=450, width='stretch', key="prediction_map")
+        st.markdown("<br/>", unsafe_allow_html=True)
 
-        # Click handler for prediction map
-        clicked_name = get_clicked_orp_name(map_pred_output)
-        if clicked_name and clicked_name in indicators.keys() and clicked_name != st.session_state.selected_orp:
-            st.session_state.selected_orp = clicked_name
-            st.rerun()
+        col_inner_map, col_inner_chart = st.columns([1.2, 1])
 
-    with col_p_chart:
-        # Chart displaying population trends
-        st.markdown("<div style='font-size: 0.9rem; color: #8c96bc; margin-bottom: 10px; font-weight: 600;'>DEMOGRAFICKÝ VÝVOJ A PROJEKCE POPULACE</div>", unsafe_allow_html=True)
+        with col_inner_map:
+            m_pred = folium.Map(location=[50.55, 13.90], zoom_start=9, tiles="cartodbpositron")
+            pred_geo = copy.deepcopy(geojson_data)
 
-        active_orp = selected_orp if selected_orp != "Celý kraj" else "Ústí nad Labem" # Default to regional center if whole region is selected
+            for feature in pred_geo.get("features", []):
+                name = feature["properties"]["name"]
+                pred = predictions_val.get(name, {})
+                feature["properties"]["current_capacity"] = pred.get("current_capacity", 0)
+                feature["properties"]["predicted_demand"] = pred.get("predicted_demand", 0)
+                feature["properties"]["deficit_percent"] = pred.get("deficit_percent", 0.0)
+                feature["properties"]["stress_alert"] = pred.get("stress_alert", False)
 
-        # Load historical & future forecast timeline for trend visualization
-        hist_data = fetch_data("/api/orp/demographics")[active_orp]
+            def pred_style_fn(feature):
+                name = feature["properties"]["name"]
+                alert = feature["properties"].get("stress_alert", False)
+                deficit = feature["properties"].get("deficit_percent", 0.0)
+                is_selected = (name == selected_orp)
 
-        # Calculate future list via import
-        from backend.forecasting import get_forecast_for_orp
-        future_list = []
-        for y in range(2026, 2036):
-            forecast = get_forecast_for_orp(active_orp, y)
-            if forecast:
-                future_list.append({
-                    "year": y,
-                    "total_pop": forecast["total_pop"],
-                    "pop_65plus": forecast["pop_65plus"],
-                    "pop_75plus": forecast["pop_75plus"],
-                    "net_migration": forecast["net_migration"]
-                })
+                if alert:
+                    fill_col = "#dc3545"
+                elif deficit > 0:
+                    fill_col = "#ff9f1c"
+                else:
+                    fill_col = "#2ec4b6"
 
-        df_hist = pd.DataFrame(hist_data)
-        df_hist["typ"] = "Historická data"
-        df_fut = pd.DataFrame(future_list)
-        df_fut["typ"] = "Demografická projekce"
-        df_all = pd.concat([df_hist, df_fut], ignore_index=True)
+                return {
+                    "fillColor": fill_col,
+                    "color": "#ffffff" if is_selected else "#444444",
+                    "weight": 3 if is_selected else 1.2,
+                    "fillOpacity": 0.7 if is_selected else 0.5,
+                }
 
-        fig_trend = go.Figure()
-        # Total Population Plot (secondary axis or separate line)
-        fig_trend.add_trace(go.Scatter(
-            x=df_all["year"], y=df_all["total_pop"],
-            name="Celková populace",
-            line=dict(color="#4285f4", width=3)
-        ))
-        # Seniors 65+
-        fig_trend.add_trace(go.Scatter(
-            x=df_all["year"], y=df_all["pop_65plus"],
-            name="Senioři 65+",
-            line=dict(color="#ff9f1c", width=2, dash="dash")
-        ))
-        # Seniors 75+
-        fig_trend.add_trace(go.Scatter(
-            x=df_all["year"], y=df_all["pop_75plus"],
-            name="Senioři 75+",
-            line=dict(color="#dc3545", width=2, dash="dot")
-        ))
+            tooltip_pred = folium.GeoJsonTooltip(
+                fields=["name", "current_capacity", "predicted_demand", "deficit_percent"],
+                aliases=["ORP:", "Kapacita lůžek:", "Očekávaná poptávka:", "Kapacitní deficit (%):"]
+            )
 
-        # Highlight projection split
-        fig_trend.add_vline(x=2025.5, line_width=1, line_dash="dash", line_color="#8c96bc")
-        fig_trend.add_annotation(x=2024.5, y=df_all["total_pop"].max() * 0.95, text="Historie", showarrow=False, font=dict(color="#8c96bc"))
-        fig_trend.add_annotation(x=2027.5, y=df_all["total_pop"].max() * 0.95, text="Projekce", showarrow=False, font=dict(color="#8c96bc"))
+            folium.GeoJson(
+                data=pred_geo,
+                style_function=pred_style_fn,
+                tooltip=tooltip_pred,
+                name="Predikce Deficitu"
+            ).add_to(m_pred)
 
-        fig_trend.update_layout(
-            title=dict(text=f"Vývoj věkové struktury: {active_orp}", font=dict(size=14, color="#ffffff")),
-            template="plotly_dark",
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(l=10, r=10, t=50, b=10),
-            xaxis=dict(gridcolor="rgba(255,255,255,0.05)", dtick=2),
-            yaxis=dict(gridcolor="rgba(255,255,255,0.05)")
-        )
-        st.plotly_chart(fig_trend, width='stretch')
+            map_pred_output = st_folium(m_pred, height=400, width='stretch', key="prediction_map")
+
+            clicked_name = get_clicked_orp_name(map_pred_output)
+            if clicked_name and clicked_name in indicators.keys():
+                if clicked_name != st.session_state.selected_orp:
+                    st.session_state.selected_orp = clicked_name
+                    st.session_state.menu_version += 1
+                    st.rerun()
+
+        with col_inner_chart:
+            active_orp = selected_orp if selected_orp != "Celý kraj" else "Ústí nad Labem"
+            hist_data = fetch_data("/api/orp/demographics")[active_orp]
+
+            from backend.forecasting import get_forecast_for_orp
+            future_list = []
+            for y in range(2026, 2036):
+                forecast = get_forecast_for_orp(active_orp, y)
+                if forecast:
+                    future_list.append({
+                        "year": y,
+                        "total_pop": forecast["total_pop"],
+                        "pop_65plus": forecast["pop_65plus"],
+                        "pop_75plus": forecast["pop_75plus"]
+                    })
+
+            df_hist = pd.DataFrame(hist_data)
+            df_fut = pd.DataFrame(future_list)
+            df_all = pd.concat([df_hist, df_fut], ignore_index=True)
+
+            fig_trend = go.Figure()
+            fig_trend.add_trace(go.Scatter(x=df_all["year"], y=df_all["total_pop"], name="Celková populace", line=dict(color="#4285f4", width=3)))
+            fig_trend.add_trace(go.Scatter(x=df_all["year"], y=df_all["pop_65plus"], name="Senioři 65+", line=dict(color="#ff9f1c", width=2, dash="dash")))
+            fig_trend.add_trace(go.Scatter(x=df_all["year"], y=df_all["pop_75plus"], name="Senioři 75+", line=dict(color="#dc3545", width=2, dash="dot")))
+
+            base_capacity = sum(s["capacity"] for s in services if s["orp"] == active_orp)
+            sim_cap_line = base_capacity + sim_new_beds
+            fig_trend.add_trace(go.Scatter(x=[2026, 2035], y=[sim_cap_line, sim_cap_line], name="Simulovaná kapacita lůžek", line=dict(color="#2ec4b6", width=2, dash="dashdot")))
+
+            fig_trend.update_layout(
+                template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                margin=dict(l=10, r=10, t=40, b=10), height=400
+            )
+            st.plotly_chart(fig_trend, width='stretch')
 
     st.markdown("<hr style='border-color: rgba(255,255,255,0.05); margin: 30px 0px;'/>", unsafe_allow_html=True)
 
@@ -681,14 +672,12 @@ with tab_predictions:
     show_white_spots = st.checkbox("Zobrazit detailní analýzu Bílých míst (White Spots Index)", value=True)
 
     if show_white_spots:
-        # Get White Spots Data from API
         white_spots = fetch_data("/api/white-spots", {"year": pred_year})
         df_ws = pd.DataFrame(white_spots)
 
         col_ws_chart, col_ws_desc = st.columns([5, 4])
 
         with col_ws_chart:
-            # Bar chart ranking ORPs
             fig_ws = px.bar(
                 df_ws,
                 x="white_spot_index",
@@ -697,16 +686,9 @@ with tab_predictions:
                 color="white_spot_index",
                 color_continuous_scale="Reds",
                 labels={"white_spot_index": "Index Bílého místa (WSI)", "orp": ""},
-                title="Srovnání ORP podle Indexu Bílých míst (vyšší index = vyšší riziko)",
                 height=380
             )
-            fig_ws.update_layout(
-                template="plotly_dark",
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=10, r=10, t=40, b=10),
-                coloraxis_showscale=False
-            )
+            fig_ws.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10), coloraxis_showscale=False)
             st.plotly_chart(fig_ws, width='stretch')
 
         with col_ws_desc:
@@ -714,31 +696,17 @@ with tab_predictions:
             <div class="metric-card white-spot-card" style="margin-top: 15px;">
                 <div style="font-weight: 800; font-size: 1.1rem; color: #ff6b6b; margin-bottom: 10px;">Metodika White Spot Indexu (WSI)</div>
                 <p style="font-size: 0.9rem; color: #c4ccdf; line-height: 1.5; margin-bottom: 10px;">
-                    <strong>Index bílých míst (WSI)</strong> identifikuje regiony, které vyžadují naléhavou pozornost při plánování sociálních služeb. Index se vypočítává jako poměr syntetického
-                    sociálního stresu (kombinace nezaměstnanosti, exekucí a vyloučených lokalit) a očekávaného tempa stárnutí seniorů 75+ ku celkové lokální kapacitě služeb.
+                    <strong>Index bílých míst (WSI)</strong> identifikuje regiony, které vyžadují naléhavou pozornost. Index kombinuje sociální stres (nezaměstnanost, exekuce, vyloučené lokality) a očekávané tempo stárnutí ku lokální kapacitě služeb.
                 </p>
                 <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 0.85rem; color: #ffbe0b;">
                     WSI = (Socioekonomický stres * Růst populace 75+) * 100 / (Kapacita služeb + 10)
                 </div>
-                <p style="font-size: 0.9rem; color: #c4ccdf; margin-top: 10px; line-height: 1.5;">
-                    💡 <strong>Nejohroženější oblastí</strong> je dlouhodobě ORP <strong>Podbořany</strong>, které disponuje pouze terénními službami,
-                    ale zcela postrádá kamenné pobytové zařízení pro seniory, přičemž populace 75+ zde roste velmi dynamicky.
-                </p>
             </div>
             """, unsafe_allow_html=True)
 
-        # Table output formatted beautifully
-        st.markdown("<div style='font-size: 0.9rem; color: #8c96bc; margin-top: 15px; margin-bottom: 10px; font-weight: 600;'>TABULKOVÉ VYJÁDŘENÍ INDEXU BÍLÝCH MÍST</div>", unsafe_allow_html=True)
-
-        # Rename columns to Czech labels for output
         df_table = df_ws.copy()
         df_table.columns = ["ORP", "Index Bílého místa (WSI)", "Nezaměstnanost (%)", "Exekuce (%)", "Celková kapacita (lůžka/klienti)", "Růst seniorů 75+ (%)"]
-
-        st.dataframe(
-            df_table,
-            width='stretch',
-            hide_index=True
-        )
+        st.dataframe(df_table, width='stretch', hide_index=True)
 
 # ----------------- TAB 3: REPORTY A EXPORT -----------------
 with tab_exports:
@@ -748,104 +716,75 @@ with tab_exports:
     st.markdown("### 📝 Exekutivní analýza pro vybrané území")
 
     if selected_orp == "Celý kraj":
-        # Regional overview report
         stressed_orps = [p["orp"] for p in predictions_val.values() if p["stress_alert"]]
         st.markdown(f"""
         <div class="metric-card" style="border-left: 5px solid #ff4b4b !important;">
             <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin-bottom: 10px;">KRITICKÁ ANALÝZA ÚSTECKÉHO KRAJE (Horizont do roku 2035)</div>
             <p style="color: #c4ccdf; line-height: 1.6; font-size: 0.95rem;">
-                Ústecký kraj čelí <strong>kombinovanému tlaku</strong>: vysokému socioekonomickému znevýhodnění a výrazně zrychlenému stárnutí populace.
-                Do roku 2035 dojde v celém kraji k nárůstu populace starší 75 let o průměrně <strong>35-40 %</strong>.
+                Ústecký kraj čelí kombinovanému tlaku: vysokému socioekonomickému znevýhodnění a výrazně zrychlenému stárnutí populace.
+                Do roku 2035 dojde v celém kraji k nárůstu populace starší 75 let o průměrně 35-40 %.
             </p>
             <div style="margin: 15px 0px; padding: 12px; background: rgba(220, 53, 69, 0.08); border: 1px solid rgba(220, 53, 69, 0.2); border-radius: 8px;">
                 <strong>🚨 Hlavní kapacitní rizika (Kritický deficit kapacit nad {deficit_threshold}%):</strong><br/>
-                Kritické ohrožení nedostatkem lůžek pobytové péče je v roce <strong>{pred_year}</strong> detekováno v <strong>{len(stressed_orps)} z 16 ORP</strong>.<br/>
-                Jedná se o oblasti: <strong>{", ".join(stressed_orps)}</strong>.
+                Kritické ohrožení je v roce {pred_year} detekováno v {len(stressed_orps)} z 16 ORP: <strong>{", ".join(stressed_orps)}</strong>.
             </div>
-            <p style="color: #c4ccdf; line-height: 1.6; font-size: 0.95rem;">
-                <strong>Doporučená strategická opatření:</strong><br/>
-                1. <strong>Investiční podpora pobytových služeb:</strong> Zaměřit krajské dotace na výstavbu lůžkových kapacit zejména v oblastech s nulovým stavem (Podbořany) a kritickým deficitem.<br/>
-                2. <strong>Posílení terénní péče:</strong> Navýšit personální a finanční kapacity pečovatelských služeb v ORP Louny, Kadaň a Žatec, což umožní seniorům setrvat déle v domácím prostředí a sníží tlak na lůžkové kapacity.<br/>
-                3. <strong>Podpora sociálního bydlení:</strong> Propojit plánování sociálních služeb s řešením exekucí a sociálního bydlení v ORP Most a Chomutov pro omezení odlivu produktivní síly z regionu.
-            </p>
         </div>
         """, unsafe_allow_html=True)
     else:
-        # Single ORP report
         orp_p = predictions_val[selected_orp]
         def_pct = orp_p["deficit_percent"]
-        growth_pct = round(((orp_p["pop_75plus"] - orp_p["hist_2025_pop_75plus"]) / orp_p["hist_2025_pop_75plus"]) * 100.0, 1)
 
-        # Risk classification
+        try:
+            if "hist_2025_pop_75plus" in orp_p:
+                pop_75_2025_rep = orp_p["hist_2025_pop_75plus"]
+            else:
+                hist_dem_rep = fetch_data("/api/orp/demographics")[selected_orp]
+                pop_75_2025_rep = hist_dem_rep[-1]["pop_75plus"]
+            growth_pct = round(((orp_p["pop_75plus"] - pop_75_2025_rep) / pop_75_2025_rep) * 100.0, 1)
+        except Exception:
+            growth_pct = 0.0
+            pop_75_2025_rep = 0
+
         if orp_p["stress_alert"]:
             risk_title = "🚨 KRITICKÉ KAPACITNÍ RIZIKO (VYSOKÉ)"
             risk_border = "border-left: 5px solid #dc3545 !important;"
-            risk_desc = f"V oblasti {selected_orp} je predikován vážný nedostatek lůžek. Rychlý růst nejstarší věkové skupiny ({growth_pct}%) překonává stávající stacionární péči. Doporučuje se okamžité plánování nových kapacit pobytových služeb nebo zásadní transformace a posílení terénních služeb o min. 25 %."
+            risk_desc = f"V oblasti {selected_orp} je predikován vážný nedostatek lůžek. Rychlý růst nejstarší věkové skupiny ({growth_pct}%) překonává stávající kapacitu."
         elif def_pct > 0:
             risk_title = "⚠️ STŘEDNÍ KAPACITNÍ RIZIKO"
             risk_border = "border-left: 5px solid #ff9f1c !important;"
-            risk_desc = f"Kapacita stacionárních služeb v ORP {selected_orp} je prozatím stabilní, avšak do roku {pred_year} se očekává deficit {def_pct}%. Situaci je nutno průběžně sledovat a koordinovat posílení domácí ošetřovatelské péče."
+            risk_desc = f"Kapacita stacionárních služeb v ORP {selected_orp} je prozatím stabilní, avšak do roku {pred_year} se očekává deficit {def_pct}%."
         else:
             risk_title = "✅ NÍZKÉ KAPACITNÍ RIZIKO"
             risk_border = "border-left: 5px solid #2ec4b6 !important;"
-            risk_desc = f"ORP {selected_orp} vykazuje dostatečnou lůžkovou kapacitu pro pokrytí očekávaného nárůstu seniorů v horizontu do roku {pred_year}. Je doporučeno udržovat stávající síť poskytovatelů."
+            risk_desc = f"ORP {selected_orp} vykazuje dostatečnou lůžkovou kapacitu pro pokrytí očekávaného nárůstu seniorů v horizontu do roku {pred_year}."
 
         st.markdown(f"""
         <div class="metric-card" style="{risk_border}">
             <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; margin-bottom: 5px;">HODNOCENÍ ÚZEMÍ: ORP {selected_orp}</div>
             <div style="font-size: 0.9rem; font-weight: 600; color: #ffbe0b; margin-bottom: 15px;">{risk_title}</div>
-
-            <p style="color: #c4ccdf; line-height: 1.6; font-size: 0.95rem;">
-                <strong>Socioekonomický kontext:</strong><br/>
-                Míra nezaměstnanosti v oblasti činí <strong>{orp_p['unemployment_rate']} %</strong> (krajský průměr: 6.7%).
-                Podíl exekucí zasahuje <strong>{orp_p['exekuce_rate']} %</strong> obyvatel (krajský průměr: 13.5%).
+            <p style="color: #c4ccdf; font-size: 0.95rem;">
+                Míra nezaměstsnanosti: <strong>{orp_p['unemployment_rate']} %</strong> | Obyvatel v exekuci: <strong>{orp_p['exekuce_rate']} %</strong><br/>
+                Populace seniorů nad 75 let vzroste do roku {pred_year} o <strong>{growth_pct} %</strong>.<br/>
+                Očekávaná teoretická poptávka: <strong>{orp_p['predicted_demand']} lůžek</strong> vs. stávající kapacita <strong>{orp_p['current_capacity']} lůžek</strong>.
             </p>
-
-            <p style="color: #c4ccdf; line-height: 1.6; font-size: 0.95rem;">
-                <strong>Analýza poptávky a stárnutí:</strong><br/>
-                Populace seniorů nad 75 let vzroste do roku {pred_year} o <strong>{growth_pct} %</strong> (z původních {orp_p['hist_2025_pop_75plus']} na očekávaných {orp_p['pop_75plus']} osob).<br/>
-                Očekávaná teoretická poptávka po lůžkách stacionární péče činí <strong>{orp_p['predicted_demand']} lůžek</strong> oproti stávající kapacitě <strong>{orp_p['current_capacity']} lůžek</strong>.
-            </p>
-
-            <div style="margin: 15px 0px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: #ffffff; font-size: 0.95rem;">
-                <strong>Doporučení pro rozvoj sociálních služeb v ORP {selected_orp}:</strong><br/>
-                {risk_desc}
+            <div style="margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; color: #ffffff;">
+                <strong>Doporučení:</strong> {risk_desc}
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br/>", unsafe_allow_html=True)
-
-    # 2. Raw Data Export Section
-    st.markdown("### 📥 Stáhnout datové podklady v otevřených formátech")
-
+    st.markdown("<br/>### 📥 Stáhnout datové podklady v otevřených formátech", unsafe_allow_html=True)
     col_d1, col_d2, col_d3 = st.columns(3)
 
-    # Export 1: Demographics (history + predictions)
     with col_d1:
-        st.markdown("""
-        <div class="metric-card" style="padding: 15px !important; margin: 0px !important;">
-            <div style="font-weight: 600; color: #ffffff; margin-bottom: 10px;">Demografická časová řada</div>
-            <p style="font-size: 0.8rem; color: #8c96bc; min-height: 50px;">Historická data 2018–2025 a predikce 2026–2035 pro vybrané území.</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Prepare demographics export data
         export_orp = selected_orp if selected_orp != "Celý kraj" else "Ústí nad Labem"
         hist_exp = fetch_data("/api/orp/demographics")[export_orp]
-
         from backend.forecasting import get_forecast_for_orp
         future_exp = []
         for y in range(2026, 2036):
             f = get_forecast_for_orp(export_orp, y)
             if f:
-                future_exp.append({
-                    "year": y,
-                    "total_pop": f["total_pop"],
-                    "pop_65plus": f["pop_65plus"],
-                    "pop_75plus": f["pop_75plus"],
-                    "net_migration": f["net_migration"]
-                })
+                future_exp.append({"year": y, "total_pop": f["total_pop"], "pop_65plus": f["pop_65plus"], "pop_75plus": f["pop_75plus"], "net_migration": f["net_migration"]})
         df_exp_dem = pd.concat([pd.DataFrame(hist_exp), pd.DataFrame(future_exp)], ignore_index=True)
         csv_dem = df_exp_dem.to_csv(index=False).encode('utf-8')
 
@@ -944,7 +883,7 @@ with tab_cssz:
                 # 77% economic activity rate, minus the unemployed
                 orp_active = int(orp_dem["pop_15_64"] * 0.77 * (1 - orp_unemp / 100))
                 total_active += orp_active
-            
+
             ratio = round(total_active / total_recipients, 2) if total_recipients > 0 else 0.0
             render_metric_card("Výdělečně činní (plátci pojistného)", f"{total_active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
             render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", "Udržitelnost systému (poměr)", "down" if ratio < 2.0 else "none")
@@ -955,7 +894,7 @@ with tab_cssz:
             orp_dem = demographics_data[selected_orp][-1]
             orp_unemp = indicators[selected_orp]["unemployment_rate"]
             active = int(orp_dem["pop_15_64"] * 0.77 * (1 - orp_unemp / 100))
-            
+
             ratio = round(active / recipients, 2) if recipients > 0 else 0.0
             render_metric_card(f"Výdělečně činní v ORP {selected_orp}", f"{active:,}".replace(",", " "), "Vypočteno z dat ČSÚ (aktivní 15-64 let)", "none")
             render_metric_card("Počet pracujících na 1 důchodce", f"{ratio:.2f}", f"Poměr pro ORP {selected_orp}", "down" if ratio < 2.0 else "none")
